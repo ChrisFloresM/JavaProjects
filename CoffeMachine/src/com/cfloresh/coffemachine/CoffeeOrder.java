@@ -1,11 +1,6 @@
 package com.cfloresh.coffemachine;
 
 public class CoffeeOrder {
-
-    public static final int WATER_PER_CUP = 200; // ml
-    public static final int MILK_PER_CUP = 50;   // ml
-    public static final int COFFE_PER_CUP = 15;  // g
-
     /* prices per coffee type:                 Espresso | Latte | Capuccino*/
     public static final int[] WATER_PER_TYPE = {250,       350,   200};
     public static final int[] MILK_PER_TYPE =  {  0,        75,   100};
