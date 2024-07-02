@@ -29,7 +29,9 @@ public class CoffeeMaker {
         REMAINING,
         TAKE,
         EXIT
+/*        abstract void stateAction();*/
     }
+
     /* Constructor to initialize fields and state */
     public CoffeeMaker() {
         totalWater = 400;
@@ -74,19 +76,22 @@ public class CoffeeMaker {
     }
 
     private void stateStart() {
-        if(!this.readInput) {
+        if (!this.readInput) {
             System.out.println("Write action (buy, fill, take, remaining, exit): ");
             this.readInput = true;
         } else {
             this.readInput = false;
-            if(!validateStartInput()) {
+            if (!validateStartInput()) {
                 System.out.println("Invalid command!\n");
                 return;
             }
-            this.state = this.userInput;
-            if (this.state.equalsIgnoreCase("fill")) {
-                this.state = "fillWater";
+
+            if (this.userInput.equalsIgnoreCase("fill")) {
+                this.state = States.FILL_WATER;
+            } else {
+                this.state = States.valueOf(this.userInput.toUpperCase());
             }
+
         }
     }
 
@@ -126,7 +131,7 @@ public class CoffeeMaker {
                 }
             }
 
-            this.state = "start";
+            this.state = States.START;
             System.out.println();
         }
     }
@@ -184,7 +189,7 @@ public class CoffeeMaker {
                 return;
             }
             this.totalWater += Integer.parseInt(this.userInput);
-            this.state = "fillMilk";
+            this.state = States.FILL_MILK;
         }
     }
 
@@ -208,7 +213,7 @@ public class CoffeeMaker {
                 return;
             }
             this.totalMilk += Integer.parseInt(this.userInput);
-            this.state = "fillCoffee";
+            this.state = States.FILL_COFFEE;
         }
     }
 
@@ -223,7 +228,7 @@ public class CoffeeMaker {
                 return;
             }
             this.totalCoffe += Integer.parseInt(this.userInput);
-            this.state = "fillCups";
+            this.state = States.FILL_CUPS;
         }
     }
 
@@ -238,7 +243,7 @@ public class CoffeeMaker {
                 return;
             }
             this.totalCups += Integer.parseInt(this.userInput);
-            this.state = "start";
+            this.state = States.START;
             System.out.println();
         }
     }
@@ -255,14 +260,14 @@ public class CoffeeMaker {
                 """, totalWater, totalMilk, totalCoffe, totalCups, totalMoney);
 
         System.out.print(status);
-        state = "start";
+        this.state = States.START;
         System.out.println();
     }
 
     private void stateTake() {
         System.out.printf("I gave you $%d\n", totalMoney);
         totalMoney = 0;
-        state = "start";
+        this.state = States.START;
         System.out.println();
     }
 }
