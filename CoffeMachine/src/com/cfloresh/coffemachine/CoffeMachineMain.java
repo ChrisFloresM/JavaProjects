@@ -11,7 +11,7 @@ public class CoffeMachineMain {
         while(!coffeMachine.getExit()) {
             coffeMachine.stateMachine();
             if(coffeMachine.getReadInput()) {
-                coffeMachine.getUserInput(scan.nextLine());
+                coffeMachine.setUserInput(scan.nextLine());
             }
         }
     }

@@ -1,154 +1,241 @@
 package com.cfloresh.coffemachine;
 
-import java.util.Scanner;
-
 public class CoffeeMaker {
 
+    /* State machine control variables */
+    private boolean readInput;
+    private boolean exit;
+    private String userInput;
+    private String state;
+
+    /* internal instance fields related to the coffee machine */
     private int totalWater;
     private int totalMilk;
     private int totalCoffe;
     private int totalCups;
     private int totalMoney;
 
+    /* CoffeeOrder object with information about the order */
     private CoffeeOrder coffeeOrder;
 
-    private String userInput;
-
-    private String state = "switchMessage";
-    private String msgState = "start";
-    private String fillSubSt = "water";
-
-    private boolean exit = false;
-    private boolean readInput = true;
-
-    /* Constructor */
-/*
+    /* Constructor to initialize fields and state */
     public CoffeeMaker() {
         totalWater = 400;
         totalMilk = 540;
         totalCoffe = 120;
         totalCups = 9;
         totalMoney = 550;
-    }*/
 
-    /* Getters and Setters */
-
-    /* ====================  Action methods for the class ==================== */
-
-    /* Method to get input from the user*/
-    public void getUserInput(String input) {
-        this.userInput = input;
+        readInput = false;
+        exit = false;
+        state = "start";
     }
 
-    public boolean getReadInput() {
-        return this.readInput;
+    public void stateMachine(){
+        switch (this.state) {
+            case "start" -> stateStart();
+            case "buy" -> stateBuy();
+            case "fillWater" -> stateFillWater();
+            case "fillMilk" -> stateFillMilk();
+            case "fillCoffee" -> stateFillCoffee();
+            case "fillCups" -> stateFillCups();
+            case "remaining" -> stateRemaining();
+            case "take" -> stateTake();
+            case "exit" -> stateExit();
+        }
+    }
+
+    public void setUserInput(String input) {
+        this.userInput = input;
     }
 
     public boolean getExit() {
         return this.exit;
     }
 
-    public void stateMachine() {
-        switch(state) {
-            case "switchMessage":
-                switchMessage();
-                readInput = !(msgState.equalsIgnoreCase("take") || msgState.equalsIgnoreCase("remaining"));
-                break;
+    public boolean getReadInput() {
+        return this.readInput;
+    }
 
-            case "start":
-                startOperation();
-                readInput = false;
-                break;
+    private void stateExit() {
+        this.exit = true;
+    }
 
-            case "buy":
-                functionBuy();
-                readInput = false;
-                break;
-
-            case "fill":
-                functionFill();
-                readInput = false;
-                break;
-
-            case "take":
-                functionTake();
-                readInput = false;
-                break;
-
-            case "remaining":
-                functionRemaining();
-                readInput = false;
-                break;
-
-            default:
-                System.out.println("Error");
-                state = "switchMessage";
-                msgState = "start";
+    private void stateStart() {
+        if(!this.readInput) {
+            System.out.println("Write action (buy, fill, take, remaining, exit): ");
+            this.readInput = true;
+        } else {
+            this.readInput = false;
+            if(!validateStartInput()) {
+                System.out.println("Invalid command!\n");
+                return;
+            }
+            this.state = this.userInput;
+            if (this.state.equalsIgnoreCase("fill")) {
+                this.state = "fillWater";
+            }
         }
     }
 
-    private void switchMessage() {
-        switch(msgState) {
-            case "start":
-                System.out.println("Write action (buy, fill, take, remaining, exit): ");
-                state = "start";
-                break;
+    private boolean validateStartInput() {
 
-            case "buy":
-                System.out.println("what do you want to buy? 1 - espresso, 2 - latte, 3 - capuccino, back - to main menu: ");
-                state = userInput;
-                break;
+        boolean validBuyCmd = this.userInput.equalsIgnoreCase("buy");
+        boolean validFillCmd = this.userInput.equalsIgnoreCase("fill");
+        boolean validTakeCmd = this.userInput.equalsIgnoreCase("take");
+        boolean validRemCmd = this.userInput.equalsIgnoreCase("remaining");
+        boolean validExitCmd = this.userInput.equalsIgnoreCase("exit");
 
-            case "fillWater":
-                System.out.println("Write how many ml of water you want to add:");
-                state = "fill";
-                break;
+        return validBuyCmd || validFillCmd || validTakeCmd || validRemCmd || validExitCmd;
 
-            case "fillMilk":
-                System.out.println("Write how many ml of milk you want to add:");
-                state = "fill";
-                break;
+    }
 
-            case "fillCoffee":
-                System.out.println("Write how many grams of coffee beans you want to add:");
-                state = "fill";
-                break;
+    private void stateBuy(){
+        if(!this.readInput) {
+            System.out.println("\nwhat do you want to buy? 1 - espresso, 2 - latte, 3 - capuccino, back - to main menu: ");
+            this.readInput = true;
+        } else {
+            this.readInput = false;
 
-            case "fillCups":
-                System.out.println("Write how many disposable cups you want to add:");
-                state = "fill";
-                break;
+            if(!validateBuyInput()) {
+                System.out.println("Invalid command!");
+                return;
+            }
 
-            case "take":
-                state = "take";
-                break;
+            String coffeType = this.userInput;
+            if (!coffeType.equalsIgnoreCase("back")) {
+                coffeeOrder = new CoffeeOrder(Integer.parseInt(coffeType));
+                if (validateOrder()) {
+                    totalWater -= coffeeOrder.getOrderWater();
+                    totalMilk -= coffeeOrder.getOrderMilk();
+                    totalCoffe -= coffeeOrder.getOrderCoffe();
+                    totalCups--;
+                    totalMoney += coffeeOrder.getOrderPrice();
+                }
+            }
 
-            case "remaining":
-                state = "remaining";
-                break;
-
+            this.state = "start";
+            System.out.println();
         }
     }
 
-    /* Start coffe machine operation */
-    public void startOperation() {
-         if (userInput.equalsIgnoreCase("exit")) {
-            exit = true;
-         } else {
-             state = "switchMessage";
-             msgState = userInput;
+    private boolean validateBuyInput() {
+        boolean validEspressCmd = this.userInput.equalsIgnoreCase("1");
+        boolean validLatteCmd = this.userInput.equalsIgnoreCase("2");
+        boolean validCapCmd = this.userInput.equalsIgnoreCase("3");
+        boolean validBackCmd = this.userInput.equalsIgnoreCase("back");
 
-             if(msgState.equalsIgnoreCase("fill")) {
-                 msgState = "fillWater";
-             }
-
-             System.out.println();
-         }
+        return validEspressCmd || validLatteCmd || validCapCmd || validBackCmd;
     }
 
-    /* printStatus */
-    public void functionRemaining() {
+    private boolean validateOrder() {
+        boolean result = true;
+
+        int orderWater = coffeeOrder.getOrderWater();
+        int orderMilk = coffeeOrder.getOrderMilk();
+        int orderCoffee = coffeeOrder.getOrderCoffe();
+
+        if (totalWater >= orderWater && totalMilk >= orderMilk && totalCoffe >= orderCoffee) {
+            System.out.println("I have enough resources, making you a coffee!");
+            return result;
+        }
+
+        result = false;
+
+        if(totalWater < orderWater) {
+            System.out.println("Sorry, not enough water!");
+        }
+
+        if(totalMilk < orderMilk) {
+            System.out.println("Sorry, not enough milk!");
+        }
+
+        if(totalCoffe < orderCoffee) {
+            System.out.println("Sorry, not enough coffee beans!");
+        }
+
+        if(totalCups < 1) {
+            System.out.println("Sorry, not enough disposable cups!");
+        }
+
+        return result;
+    }
+
+    private void stateFillWater() {
+        if(!this.readInput) {
+            System.out.println("\nWrite how many ml of water you want to add:");
+            this.readInput = true;
+        } else {
+            this.readInput = false;
+            if(!validateFillInput()) {
+                System.out.println("Input a numeric value!");
+                return;
+            }
+            this.totalWater += Integer.parseInt(this.userInput);
+            this.state = "fillMilk";
+        }
+    }
+
+    private boolean validateFillInput() {
+
+        for(Character c : this.userInput.toCharArray()) {
+            if (!Character.isDigit(c)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private void stateFillMilk() {
+        if(!this.readInput) {
+            System.out.println("\nWrite how many ml of milk you want to add:");
+            this.readInput = true;
+        } else {
+            this.readInput = false;
+            if(!validateFillInput()) {
+                System.out.println("Input a numeric value!");
+                return;
+            }
+            this.totalMilk += Integer.parseInt(this.userInput);
+            this.state = "fillCoffee";
+        }
+    }
+
+    private void stateFillCoffee() {
+        if(!this.readInput) {
+            System.out.println("\nWrite how many grams of coffee you want to add:");
+            this.readInput = true;
+        } else {
+            this.readInput = false;
+            if(!validateFillInput()) {
+                System.out.println("Input a numeric value!");
+                return;
+            }
+            this.totalCoffe += Integer.parseInt(this.userInput);
+            this.state = "fillCups";
+        }
+    }
+
+    private void stateFillCups() {
+        if(!this.readInput) {
+            System.out.println("\nWrite how many disposable cups you want to add:");
+            this.readInput = true;
+        } else {
+            this.readInput = false;
+            if(!validateFillInput()) {
+                System.out.println("Input a numeric value!");
+                return;
+            }
+            this.totalCups += Integer.parseInt(this.userInput);
+            this.state = "start";
+            System.out.println();
+        }
+    }
+
+    private void stateRemaining() {
         String status = String.format("""
+                
                 The coffee machine has:
                 %d ml of water
                 %d ml of milk
@@ -158,106 +245,17 @@ public class CoffeeMaker {
                 """, totalWater, totalMilk, totalCoffe, totalCups, totalMoney);
 
         System.out.print(status);
-        state = "switchMessage";
+        state = "start";
         System.out.println();
-        msgState = "start";
-
     }
 
-    /* Validate order */
-    public boolean validateOrder() {
-        boolean result = true;
-
-        int orderWater = coffeeOrder.getOrderWater();
-        int orderMilk = coffeeOrder.getOrderMilk();
-        int orderCoffee = coffeeOrder.getOrderCoffe();
-
-        if (totalWater >= orderWater && totalMilk >= orderMilk && totalCoffe >= orderCoffee) {
-            System.out.println("I have enough resources, making you a coffee!\n");
-            return result;
-        }
-
-        result = false;
-
-        if(totalWater < orderWater) {
-            System.out.println("Sorry, not enough water!\n");
-        }
-
-        if(totalMilk < orderMilk) {
-            System.out.println("Sorry, not enough milk!\n");
-        }
-
-        if(totalCoffe < orderCoffee) {
-            System.out.println("Sorry, not enough coffee beans!\n");
-        }
-
-        if(totalCups < 1) {
-            System.out.println("Sorry, not enough disposable cups!\n");
-        }
-
-        return result;
-    }
-
-    public void functionBuy(){
-
-        String coffeType = userInput;
-
-        if (!coffeType.equalsIgnoreCase("back")) {
-            coffeeOrder = new CoffeeOrder(Integer.parseInt(coffeType));
-            if(validateOrder()) {
-                totalWater -= coffeeOrder.getOrderWater();
-                totalMilk -= coffeeOrder.getOrderMilk();
-                totalCoffe -= coffeeOrder.getOrderCoffe();
-                totalCups--;
-                totalMoney += coffeeOrder.getOrderPrice();
-            }
-        } else {
-            System.out.println();
-        }
-
-        state = "switchMessage";
-        msgState = "start";
-
-    }
-
-    public void functionFill() {
-        switch(msgState) {
-            case "fillWater":
-                totalWater += Integer.parseInt(userInput);
-                state = "switchMessage";
-                msgState = "fillMilk";
-                break;
-
-            case "fillMilk":
-                totalMilk += Integer.parseInt(userInput);
-                state = "switchMessage";
-                msgState = "fillCoffee";
-                break;
-
-            case "fillCoffee":
-                totalCoffe += Integer.parseInt(userInput);
-                state = "switchMessage";
-                msgState = "fillCups";
-                break;
-
-            case "fillCups":
-                totalCups += Integer.parseInt(userInput);
-                state = "switchMessage";
-                msgState = "start";
-                System.out.println();
-                break;
-
-            default:
-                System.out.println("Error");
-        }
-    }
-
-    public void functionTake() {
+    private void stateTake() {
         System.out.printf("I gave you $%d\n", totalMoney);
         totalMoney = 0;
-        state = "switchMessage";
+        state = "start";
         System.out.println();
-        msgState = "start";
     }
 }
+
+
 
