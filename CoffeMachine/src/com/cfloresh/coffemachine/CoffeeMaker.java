@@ -22,14 +22,14 @@ public class CoffeeMaker {
     private boolean readInput = true;
 
     /* Constructor */
-
+/*
     public CoffeeMaker() {
         totalWater = 400;
         totalMilk = 540;
         totalCoffe = 120;
         totalCups = 9;
         totalMoney = 550;
-    }
+    }*/
 
     /* Getters and Setters */
 
