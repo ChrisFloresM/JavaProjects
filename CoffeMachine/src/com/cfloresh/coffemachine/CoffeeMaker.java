@@ -177,13 +177,11 @@ public class CoffeeMaker {
     }
 
     private boolean validateFillInput() {
-
-        for(Character c : this.userInput.toCharArray()) {
+        for (Character c : this.userInput.toCharArray()) {
             if (!Character.isDigit(c)) {
                 return false;
             }
         }
-
         return true;
     }
 

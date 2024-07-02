@@ -8,7 +8,6 @@ public class CoffeeOrder {
     public static final int[] COST_PER_TYPE =  {  4,         7,     6};
 
     private final int coffeeType;
-    private int orderCups;
     private int orderWater;
     private int orderMilk;
     private int orderCoffe;
@@ -21,48 +20,17 @@ public class CoffeeOrder {
     }
 
     /* Getters and Setters */
-    public int getOrderCups() {
-        return orderCups;
-    }
-
-    public void setOrderCups(int orderCups) {
-        this.orderCups = orderCups;
-    }
-
     public int getOrderWater() {
         return orderWater;
     }
-
-    public void setOrderWater(int orederWater) {
-        this.orderWater = orederWater;
-    }
-
     public int getOrderMilk() {
         return orderMilk;
     }
-
-    public void setOrderMilk(int orderMilk) {
-        this.orderMilk = orderMilk;
-    }
-
     public int getOrderCoffe() {
         return orderCoffe;
     }
-
-    public void setOrderCoffe(int orderCoffe) {
-        this.orderCoffe = orderCoffe;
-    }
-
-    public int getCoffeeType() {
-        return coffeeType;
-    }
-
     public int getOrderPrice() {
         return orderPrice;
-    }
-
-    public void setOrderPrice(int orderPrice) {
-        this.orderPrice = orderPrice;
     }
 
     /* ====================  Action methods for the class ==================== */
