@@ -6,7 +6,7 @@ public class CoffeeMaker {
     private boolean readInput;
     private boolean exit;
     private String userInput;
-    private String state;
+    private States state;
 
     /* internal instance fields related to the coffee machine */
     private int totalWater;
@@ -18,6 +18,18 @@ public class CoffeeMaker {
     /* CoffeeOrder object with information about the order */
     private CoffeeOrder coffeeOrder;
 
+    /* enum of states */
+    enum States {
+        START,
+        BUY,
+        FILL_WATER,
+        FILL_MILK,
+        FILL_COFFEE,
+        FILL_CUPS,
+        REMAINING,
+        TAKE,
+        EXIT
+    }
     /* Constructor to initialize fields and state */
     public CoffeeMaker() {
         totalWater = 400;
@@ -28,20 +40,20 @@ public class CoffeeMaker {
 
         readInput = false;
         exit = false;
-        state = "start";
+        state = States.START;
     }
 
     public void stateMachine(){
         switch (this.state) {
-            case "start" -> stateStart();
-            case "buy" -> stateBuy();
-            case "fillWater" -> stateFillWater();
-            case "fillMilk" -> stateFillMilk();
-            case "fillCoffee" -> stateFillCoffee();
-            case "fillCups" -> stateFillCups();
-            case "remaining" -> stateRemaining();
-            case "take" -> stateTake();
-            case "exit" -> stateExit();
+            case START -> stateStart();
+            case BUY -> stateBuy();
+            case FILL_WATER -> stateFillWater();
+            case FILL_MILK -> stateFillMilk();
+            case FILL_COFFEE -> stateFillCoffee();
+            case FILL_CUPS -> stateFillCups();
+            case REMAINING -> stateRemaining();
+            case TAKE -> stateTake();
+            case EXIT -> stateExit();
         }
     }
 
