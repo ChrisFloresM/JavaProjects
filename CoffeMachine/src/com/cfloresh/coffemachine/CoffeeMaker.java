@@ -12,6 +12,15 @@ public class CoffeeMaker {
 
     private CoffeeOrder coffeeOrder;
 
+    private String userInput;
+
+    private String state = "switchMessage";
+    private String msgState = "start";
+    private String fillSubSt = "water";
+
+    private boolean exit = false;
+    private boolean readInput = true;
+
     /* Constructor */
 
     public CoffeeMaker() {
@@ -26,20 +35,115 @@ public class CoffeeMaker {
 
     /* ====================  Action methods for the class ==================== */
 
+    /* Method to get input from the user*/
+    public void getUserInput(String input) {
+        this.userInput = input;
+    }
+
+    public boolean getReadInput() {
+        return this.readInput;
+    }
+
+    public boolean getExit() {
+        return this.exit;
+    }
+
+    public void stateMachine() {
+        switch(state) {
+            case "switchMessage":
+                switchMessage();
+                readInput = !(msgState.equalsIgnoreCase("take") || msgState.equalsIgnoreCase("remaining"));
+                break;
+
+            case "start":
+                startOperation();
+                readInput = false;
+                break;
+
+            case "buy":
+                functionBuy();
+                readInput = false;
+                break;
+
+            case "fill":
+                functionFill();
+                readInput = false;
+                break;
+
+            case "take":
+                functionTake();
+                readInput = false;
+                break;
+
+            case "remaining":
+                functionRemaining();
+                readInput = false;
+                break;
+
+            default:
+                System.out.println("Error");
+                state = "switchMessage";
+                msgState = "start";
+        }
+    }
+
+    private void switchMessage() {
+        switch(msgState) {
+            case "start":
+                System.out.println("Write action (buy, fill, take, remaining, exit): ");
+                state = "start";
+                break;
+
+            case "buy":
+                System.out.println("what do you want to buy? 1 - espresso, 2 - latte, 3 - capuccino, back - to main menu: ");
+                state = userInput;
+                break;
+
+            case "fillWater":
+                System.out.println("Write how many ml of water you want to add:");
+                state = "fill";
+                break;
+
+            case "fillMilk":
+                System.out.println("Write how many ml of milk you want to add:");
+                state = "fill";
+                break;
+
+            case "fillCoffee":
+                System.out.println("Write how many grams of coffee beans you want to add:");
+                state = "fill";
+                break;
+
+            case "fillCups":
+                System.out.println("Write how many disposable cups you want to add:");
+                state = "fill";
+                break;
+
+            case "take":
+                state = "take";
+                break;
+
+            case "remaining":
+                state = "remaining";
+                break;
+
+        }
+    }
+
     /* Start coffe machine operation */
     public void startOperation() {
-        Scanner scan = new Scanner(System.in);
-        while(true) {
-            System.out.println("Write action (buy, fill, take, remaining, exit): ");
-            String function = scan.nextLine();
+         if (userInput.equalsIgnoreCase("exit")) {
+            exit = true;
+         } else {
+             state = "switchMessage";
+             msgState = userInput;
 
-            if(function.equalsIgnoreCase("exit")) {
-                break;
-            }
+             if(msgState.equalsIgnoreCase("fill")) {
+                 msgState = "fillWater";
+             }
 
-            requestFunction(scan, function);
-            System.out.println();
-        }
+             System.out.println();
+         }
     }
 
     /* printStatus */
@@ -54,6 +158,10 @@ public class CoffeeMaker {
                 """, totalWater, totalMilk, totalCoffe, totalCups, totalMoney);
 
         System.out.print(status);
+        state = "switchMessage";
+        System.out.println();
+        msgState = "start";
+
     }
 
     /* Validate order */
@@ -65,45 +173,34 @@ public class CoffeeMaker {
         int orderCoffee = coffeeOrder.getOrderCoffe();
 
         if (totalWater >= orderWater && totalMilk >= orderMilk && totalCoffe >= orderCoffee) {
-            System.out.println("I have enough resources, making you a coffee!");
+            System.out.println("I have enough resources, making you a coffee!\n");
             return result;
         }
 
         result = false;
 
         if(totalWater < orderWater) {
-            System.out.println("Sorry, not enough water!");
+            System.out.println("Sorry, not enough water!\n");
         }
 
         if(totalMilk < orderMilk) {
-            System.out.println("Sorry, not enough milk!");
+            System.out.println("Sorry, not enough milk!\n");
         }
 
         if(totalCoffe < orderCoffee) {
-            System.out.println("Sorry, not enough coffee beans!");
+            System.out.println("Sorry, not enough coffee beans!\n");
         }
 
         if(totalCups < 1) {
-            System.out.println("Sorry, not enough disposable cups!");
+            System.out.println("Sorry, not enough disposable cups!\n");
         }
 
         return result;
     }
 
-    public void requestFunction(Scanner scan, String request) {
-        System.out.println();
-        switch (request) {
-            case "buy" -> functionBuy(scan);
-            case "fill" -> functionFill(scan);
-            case "take" -> functionTake();
-            case "remaining" -> functionRemaining();
-            default -> System.out.println("Not recognized function");
-        }
-    }
+    public void functionBuy(){
 
-    public void functionBuy(Scanner scan){
-        System.out.println("what do you want to buy? 1 - espresso, 2 - latte, 3 - capuccino, back - to main menu: ");
-        String coffeType = scan.nextLine();
+        String coffeType = userInput;
 
         if (!coffeType.equalsIgnoreCase("back")) {
             coffeeOrder = new CoffeeOrder(Integer.parseInt(coffeType));
@@ -114,30 +211,53 @@ public class CoffeeMaker {
                 totalCups--;
                 totalMoney += coffeeOrder.getOrderPrice();
             }
+        } else {
+            System.out.println();
         }
+
+        state = "switchMessage";
+        msgState = "start";
 
     }
 
-    public void functionFill(Scanner scan) {
-        System.out.println("Write how many ml of water you want to add:");
-        totalWater += scan.nextInt();
+    public void functionFill() {
+        switch(msgState) {
+            case "fillWater":
+                totalWater += Integer.parseInt(userInput);
+                state = "switchMessage";
+                msgState = "fillMilk";
+                break;
 
-        System.out.println("Write how many ml of milk you want to add:");
-        totalMilk += scan.nextInt();
+            case "fillMilk":
+                totalMilk += Integer.parseInt(userInput);
+                state = "switchMessage";
+                msgState = "fillCoffee";
+                break;
 
-        System.out.println("Write how many grams of coffee beans you want to add:");
-        totalCoffe += scan.nextInt();
+            case "fillCoffee":
+                totalCoffe += Integer.parseInt(userInput);
+                state = "switchMessage";
+                msgState = "fillCups";
+                break;
 
-        System.out.println("Write how many disposable cups you want to add:");
-        totalCups += scan.nextInt();
+            case "fillCups":
+                totalCups += Integer.parseInt(userInput);
+                state = "switchMessage";
+                msgState = "start";
+                System.out.println();
+                break;
 
-        //clear the scan buffer input
-        scan.nextLine();
+            default:
+                System.out.println("Error");
+        }
     }
 
     public void functionTake() {
         System.out.printf("I gave you $%d\n", totalMoney);
         totalMoney = 0;
+        state = "switchMessage";
+        System.out.println();
+        msgState = "start";
     }
 }
 
