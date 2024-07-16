@@ -1,185 +1,68 @@
 package com.cfloresh.battleshipgame;
 
+import java.io.IOException;
 import java.util.Scanner;
 
 public class Game {
-    private final int TOTAL_SHIPS = 5;
 
-    private final Board board;
-    private final Board fogBoard;
-    private final Ship[] gameShips = new Ship[TOTAL_SHIPS];
+    private final int TOTAL_PLAYERS = 2;
 
-    private boolean winCondition = false;
+    private final Player[] players = new Player[TOTAL_PLAYERS];
 
-    private boolean shotDrankShip = false;
-
-    public Game() {
-        this.board = new Board();
-        this.fogBoard = new Board();
-        this.board.printBoard();
-    }
-
-    public void requestUserInput(Scanner scan) {
-        ShipType[] shipTypes = ShipType.values();
-
-        String start;
-        String end;
-
-        for (int i = 0; i < TOTAL_SHIPS; i++){
-
-            System.out.printf("Enter the coordinates of the %s (%d cells)\n", shipTypes[i].getTypeName(), shipTypes[i].getTotalShipCell());
-
-            while(true) {
-                start = scan.next();
-                end = scan.next();
-                gameShips[i] = new Ship(start, end, shipTypes[i]);
-
-                if (!gameShips[i].isShipIsValid()) {
-                    System.out.println("\nError! Wrong ship location! Try again:");
-                    continue;
-                }
-
-                if(!gameShips[i].isValidShipLength()) {
-                    System.out.printf("\nError! Wrong length of the %s! Try again:%n", shipTypes[i].getTypeName());
-                    continue;
-                }
-
-                if(!placeShip(gameShips[i])) {
-                    System.out.println("\nError! You placed it too close to another one. Try again:");
-                    continue;
-                }
-
-                board.printBoard();
-                System.out.println();
-                scan.nextLine();
-                break;
-            }
-
+    public void setPlayerShips(Scanner scan) {
+        for (int i = 0; i < TOTAL_PLAYERS; i++) {
+            players[i] = new Player();
+            System.out.printf("Player %d, place your ships on the game field: %n%n", i + 1);
+            players[i].requestUserInput(scan);
+            System.out.println("\nPress Enter and pass the move to another player");
+            scan.nextLine();
+            clearConsole();
         }
     }
 
     public void startGame(Scanner scan) {
-        System.out.println("The game starts!\n");
-        fogBoard.printBoard();
 
-        System.out.println("\nTake a shot!");
+        Player currentPlayer;
+        Player enemyPlayer;
 
-        while(!winCondition) {
-            takeShot(scan);
-        }
-
-    }
-
-    private void takeShot(Scanner scan) {
-
-        String shotPosition;
+        int n = 0;
         while(true) {
-            shotPosition = scan.nextLine();
+            currentPlayer = players[n % 2];
+            enemyPlayer = players[(n + 1) % 2];
 
-            if (Board.checkInvalidCoordinates(shotPosition)) {
-                System.out.println("\nError. Wrong coordinates! Try again:");
-                continue;
+            showBoards(enemyPlayer.getFogBoard(), currentPlayer.getBoard());
+
+            System.out.printf("\nPlayer %d, is your turn:\n", (n % 2) + 1);
+            currentPlayer.takeShot(scan, enemyPlayer.getBoard(), enemyPlayer.getFogBoard());
+
+            if(currentPlayer.getWinCondtion()) {
+                break;
+            } else {
+                System.out.println("\nPress Enter and pass the move to another player");
+                scan.nextLine();
+                clearConsole();
             }
 
-            break;
-        }
-
-        shotAtPosition(shotPosition);
-    }
-
-    private void findHitShip(String coord){
-
-        ShipType shipType;
-
-        for(int i = 0; i < TOTAL_SHIPS; i++) {
-            for(String shipCoord : gameShips[i].getShipPositions()) {
-                if(coord.equals(shipCoord)) {
-                    shipType = gameShips[i].getShipType();
-                    shipType.increaseTotalShots();
-
-                    if(shipType.getTotalShots() == shipType.getTotalShipCell()) {
-                        board.increaseTotalDrankShips();
-                        shotDrankShip = true;
-                    }
-
-                    return;
-                }
-            }
+            n++;
         }
     }
 
-    private void shotAtPosition(String coord) {
-
-        int shotPositionR = coord.charAt(0) - 64;
-        int shotPositionC = Integer.parseInt(coord.substring(1));
-
-        String currentPosition = board.getBoardCell(shotPositionR, shotPositionC);
-        String cellValue = currentPosition.equals("O") || currentPosition.equals("X") ? "X" : "M";
-
-        if(currentPosition.equals("O")) {
-            findHitShip(coord);
-        }
-
-        board.setBoardCell(shotPositionR, shotPositionC, cellValue);
-        fogBoard.setBoardCell(shotPositionR, shotPositionC, cellValue);
-        fogBoard.printBoard();
-
-        if (cellValue.equals("X")) {
-
-            if(board.getTotalDrankShips() == TOTAL_SHIPS) {
-                System.out.println("\nYou sank the last ship. You won. Congratulations!");
-                winCondition = true;
-                return;
-            }
-
-            if(shotDrankShip) {
-                System.out.println("\nYou sank a ship! Specify a new target:");
-                shotDrankShip = false;
-                return;
-            }
-
-            System.out.println("\nYou hit a Ship! Try again:");
-        } else {
-            System.out.println("\nYou missed. Try again:");
-        }
+    private void showBoards(Board boardA, Board boardB) {
+        boardA.printBoard();
+        System.out.println("-----------------------");
+        boardB.printBoard();
     }
 
-    private boolean placeShip(Ship ship) {
-
-        /* Check the bounds of the ship and the required space to place it */
-        int shipStartCol = ship.getColStart();
-        int shipEndCol = ship.getColEnd();
-
-        char shipStartRow = ship.getRowStart();
-        char shipEndRow = ship.getRowEnd();
-
-        if(shipStartRow > shipEndRow) {
-            char temp = shipEndRow;
-            shipEndRow = shipStartRow;
-            shipStartRow = temp;
-        }
-
-        if(shipStartCol > shipEndCol) {
-            int temp = shipEndCol;
-            shipEndCol = shipStartCol;
-            shipStartCol = temp;
-        }
-
-        for(int r = shipStartRow - 65; r <= shipEndRow - 63 && r <= 10 ; r++) {
-            for(int c = shipStartCol - 1; c <= shipEndCol + 1 && c <= 10; c++) {
-                if(this.board.getBoard()[r][c].equals("O")) {
-                    return false;
-                }
+    private void clearConsole() {
+        try {
+            if (System.getProperty("os.name").contains("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
             }
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
         }
-
-        for (int r = shipStartRow - 64; r <= shipEndRow - 64; r++) {
-            for(int c = shipStartCol; c <= shipEndCol; c++) {
-                this.board.setBoardCell(r, c, "O");
-            }
-        }
-
-        return true;
     }
-
 }
