@@ -71,6 +71,7 @@ public class Game {
     }
 
     private void takeShot(Scanner scan) {
+
         String shotPosition;
         while(true) {
             shotPosition = scan.nextLine();
@@ -83,17 +84,13 @@ public class Game {
             break;
         }
 
-        int shotPositionR = shotPosition.charAt(0) - 64;
-        int shotPositionC = Integer.parseInt(shotPosition.substring(1));
-        String currentPositionValue = board.getBoardCell(shotPositionR, shotPositionC);
-
-        String shotResult = currentPositionValue.equals("O") || currentPositionValue.equals("X") ? "X" : "M";
-
-        shotAtPosition(shotPosition, shotPositionR, shotPositionC, currentPositionValue, shotResult);
+        shotAtPosition(shotPosition);
     }
 
     private void findHitShip(String coord){
+
         ShipType shipType;
+
         for(int i = 0; i < TOTAL_SHIPS; i++) {
             for(String shipCoord : gameShips[i].getShipPositions()) {
                 if(coord.equals(shipCoord)) {
@@ -111,14 +108,20 @@ public class Game {
         }
     }
 
-    private void shotAtPosition(String coord, int R, int C, String currentPosition, String cellValue) {
+    private void shotAtPosition(String coord) {
+
+        int shotPositionR = coord.charAt(0) - 64;
+        int shotPositionC = Integer.parseInt(coord.substring(1));
+
+        String currentPosition = board.getBoardCell(shotPositionR, shotPositionC);
+        String cellValue = currentPosition.equals("O") || currentPosition.equals("X") ? "X" : "M";
 
         if(currentPosition.equals("O")) {
             findHitShip(coord);
         }
 
-        board.setBoardCell(R, C, cellValue);
-        fogBoard.setBoardCell(R, C, cellValue);
+        board.setBoardCell(shotPositionR, shotPositionC, cellValue);
+        fogBoard.setBoardCell(shotPositionR, shotPositionC, cellValue);
         fogBoard.printBoard();
 
         if (cellValue.equals("X")) {
@@ -142,12 +145,13 @@ public class Game {
     }
 
     private boolean placeShip(Ship ship) {
+
         /* Check the bounds of the ship and the required space to place it */
         int shipStartCol = ship.getColStart();
         int shipEndCol = ship.getColEnd();
 
         char shipStartRow = ship.getRowStart();
-        char shipEndRow = ship.getROwEnd();
+        char shipEndRow = ship.getRowEnd();
 
         if(shipStartRow > shipEndRow) {
             char temp = shipEndRow;

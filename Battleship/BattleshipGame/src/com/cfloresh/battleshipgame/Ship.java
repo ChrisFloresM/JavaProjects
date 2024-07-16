@@ -46,7 +46,7 @@ class Ship {
         return rowStart;
     }
 
-    public char getROwEnd() {
+    public char getRowEnd() {
         return rowEnd;
     }
 
@@ -128,38 +128,4 @@ class Ship {
         }
     }
 
-    public void showShipPositions() {
-        for(String p : shipPositions) {
-            System.out.print( p + " ");
-        }
-    }
-
 }
-
-/*
-*
-*
-*     private void calculateShipPositions() {
-        shipPositions = new String[shipLength];
-        shipPositions[0] = start;
-        shipPositions[shipLength - 1] = end;
-
-        int arrPos = 1;
-        boolean isReversed;
-
-        if (shipIsHorizontal) {
-            isReversed = colStartAsInt > colEndAsInt;
-            for (int i = 1; i < shipLength - 1; i++) {
-                int col = isReversed ? colStartAsInt - i : colStartAsInt + i;
-                shipPositions[arrPos++] = String.valueOf(endPositionChars[0]) + col;
-            }
-        } else {
-            isReversed = startPositionChars[0] > endPositionChars[0];
-            for (int i = 1; i < shipLength - 1; i++) {
-                char row = (char) (isReversed ? startPositionChars[0] - i : startPositionChars[0] + i);
-                shipPositions[arrPos++] = row + String.valueOf(colEndAsInt);
-            }
-        }
-    }
-*
-* */
