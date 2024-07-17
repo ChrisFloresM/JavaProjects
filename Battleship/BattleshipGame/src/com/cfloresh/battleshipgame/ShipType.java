@@ -9,12 +9,10 @@ public enum ShipType {
 
     private final int totalShipCells;
     private final String typeName;
-    private int totalShots;
 
     ShipType(int totalShipCells, String typeName) {
         this.totalShipCells = totalShipCells;
         this.typeName = typeName;
-        this.totalShots = 0;
     }
 
     public int getTotalShipCell() {
@@ -25,11 +23,4 @@ public enum ShipType {
         return this.typeName;
     }
 
-    public void increaseTotalShots() {
-        totalShots++;
-    }
-
-    public int getTotalShots() {
-        return totalShots;
-    }
 }

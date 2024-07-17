@@ -8,7 +8,7 @@ public class Player {
 
     private final Board board;
     private final Board fogBoard;
-    private final Ship[] gameShips = new Ship[TOTAL_SHIPS];
+    public final Ship[] gameShips = new Ship[TOTAL_SHIPS]; //TODO: Made public for testing purposes
 
     private boolean winCondition = false;
 
@@ -98,9 +98,9 @@ public class Player {
             for(String shipCoord : enemyShips[i].getShipPositions()) {
                 if(coord.equals(shipCoord)) {
                     shipType = enemyShips[i].getShipType();
-                    shipType.increaseTotalShots();
+                    enemyShips[i].increaseTotalShots();
 
-                    if(shipType.getTotalShots() == shipType.getTotalShipCell()) {
+                    if(enemyShips[i].getTotalShots() == shipType.getTotalShipCell()) {
                         enemyBoard.increaseTotalDrankShips();
                         shotDrankShip = true;
                     }
@@ -130,13 +130,12 @@ public class Player {
         if (cellValue.equals("X")) {
 
             if(enemyBoard.getTotalDrankShips() == TOTAL_SHIPS) {
-                System.out.println("\nYou sank the last ship. You won. Congratulations!");
                 winCondition = true;
                 return;
             }
 
             if(shotDrankShip) {
-                System.out.println("\nYou sank a ship! Specify a new target:");
+                System.out.println("\nYou sank a ship! Specify a new target");
                 shotDrankShip = false;
                 return;
             }
@@ -147,7 +146,7 @@ public class Player {
         }
     }
 
-    private boolean placeShip(Ship ship) {
+    public boolean placeShip(Ship ship) { //TODO: Made public for testing purpose only
 
         /* Check the bounds of the ship and the required space to place it */
         int shipStartCol = ship.getColStart();

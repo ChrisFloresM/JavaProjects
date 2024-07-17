@@ -5,7 +5,7 @@ public class Board {
     private final String[][] board;
     private static final int SIZE = 11;
     private static final int VALID_COORDINATE_LEN = 2;
-    private static int totalDrankShips = 0;
+    private int totalDrankShips = 0;
 
     public String[][] getBoard() {
         return board;

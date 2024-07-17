@@ -18,6 +18,8 @@ class Ship {
 
     private final ShipType shipType;
 
+    private int totalShots;
+
     public boolean isShipIsValid() {
         return shipIsValid;
     }
@@ -50,10 +52,16 @@ class Ship {
         return rowEnd;
     }
 
+    public int getTotalShots() {
+        return totalShots;
+    }
+
     public Ship(String start, String end, ShipType shipType) {
         this.start = start;
         this.end = end;
         this.shipType = shipType;
+
+        totalShots = 0;
 
         if(validityChecks()) {
             calculateShipPositions();
@@ -126,6 +134,10 @@ class Ship {
                 shipPositions[arrPos++] = row + String.valueOf(colEnd);
             }
         }
+    }
+
+    public void increaseTotalShots() {
+        totalShots++;
     }
 
 }
