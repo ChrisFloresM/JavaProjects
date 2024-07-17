@@ -33,7 +33,7 @@ public class Game {
             showBoards(enemyPlayer.getFogBoard(), currentPlayer.getBoard());
 
             System.out.printf("\nPlayer %d, is your turn:\n", (n % 2) + 1);
-            currentPlayer.takeShot(scan, enemyPlayer.getBoard(), enemyPlayer.getFogBoard());
+            currentPlayer.takeShot(scan, enemyPlayer.getBoard(), enemyPlayer.getFogBoard(), enemyPlayer.getGameShips());
 
             if(currentPlayer.getWinCondtion()) {
                 break;

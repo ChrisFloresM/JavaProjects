@@ -26,6 +26,8 @@ public class Player {
         return this.fogBoard;
     }
 
+    public Ship[] getGameShips() { return this.gameShips; }
+
     public Player() {
         this.board = new Board();
         this.fogBoard = new Board();
@@ -71,19 +73,7 @@ public class Player {
         }
     }
 
-/*    public void startGame(Scanner scan) {
-        System.out.println("The game starts!\n");
-        fogBoard.printBoard();
-
-        System.out.println("\nTake a shot!");
-
-        while(!winCondition) {
-            takeShot(scan);
-        }
-
-    }*/
-
-    public void takeShot(Scanner scan, Board enemyBoard, Board fogEnemyBoard) {
+    public void takeShot(Scanner scan, Board enemyBoard, Board fogEnemyBoard, Ship[] enemyShips) {
 
         String shotPosition;
         while(true) {
@@ -97,17 +87,17 @@ public class Player {
             break;
         }
 
-        shotAtPosition(shotPosition, enemyBoard, fogEnemyBoard);
+        shotAtPosition(shotPosition, enemyBoard, fogEnemyBoard, enemyShips);
     }
 
-    private void findHitShip(String coord, Board enemyBoard){
+    private void findHitShip(String coord, Board enemyBoard, Ship[] enemyShips){
 
         ShipType shipType;
 
         for(int i = 0; i < TOTAL_SHIPS; i++) {
-            for(String shipCoord : gameShips[i].getShipPositions()) { //TODO: Get enemy ships, not player ones.
+            for(String shipCoord : enemyShips[i].getShipPositions()) {
                 if(coord.equals(shipCoord)) {
-                    shipType = gameShips[i].getShipType();
+                    shipType = enemyShips[i].getShipType();
                     shipType.increaseTotalShots();
 
                     if(shipType.getTotalShots() == shipType.getTotalShipCell()) {
@@ -121,7 +111,7 @@ public class Player {
         }
     }
 
-    private void shotAtPosition(String coord, Board enemyBoard, Board fogEnemyBoard) {
+    private void shotAtPosition(String coord, Board enemyBoard, Board fogEnemyBoard, Ship[] enemyShips) {
 
         int shotPositionR = coord.charAt(0) - 64;
         int shotPositionC = Integer.parseInt(coord.substring(1));
@@ -130,7 +120,7 @@ public class Player {
         String cellValue = currentPosition.equals("O") || currentPosition.equals("X") ? "X" : "M";
 
         if(currentPosition.equals("O")) {
-            findHitShip(coord, enemyBoard);
+            findHitShip(coord, enemyBoard, enemyShips);
         }
 
         enemyBoard.setBoardCell(shotPositionR, shotPositionC, cellValue);
