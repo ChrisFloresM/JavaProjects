@@ -6,18 +6,15 @@ public enum States {
         @Override
         public void action(BudgetManager object) {
             object.showMenu();
-            object.setReceiveUserInput(true);
         }
 
     },
 
     ADD_INCOME {
-
         @Override
         public void action(BudgetManager object) {
             object.addIncome();
         }
-
     },
 
 /*    ADD_PURCHASE,

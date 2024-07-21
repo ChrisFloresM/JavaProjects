@@ -11,14 +11,13 @@ public class Main {
         Scanner scan = new Scanner(System.in);
         BudgetManager budgetManager = new BudgetManager();
 
-        while(budgetManager.isExitState()) {
+        while(!budgetManager.isExitState()) {
             budgetManager.stateMachine();
 
-            if(budgetManager.isRceiveUserInpu()) {
+            if(budgetManager.isReceiveInput()) {
                 budgetManager.setInput(scan.nextLine());
             }
         }
-014
     }
 
 
