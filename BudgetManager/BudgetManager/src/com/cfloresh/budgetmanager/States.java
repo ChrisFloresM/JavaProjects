@@ -17,9 +17,19 @@ public enum States {
         }
     },
 
-/*    ADD_PURCHASE,
-    SHOW_LIST_PURCHASES,
-    BALANCE,*/
+    ADD_PURCHASE {
+        @Override
+        public void action(BudgetManager object) { object.addPurchase();}
+    },
+    SHOW_LIST_PURCHASES {
+        @Override
+        public void action(BudgetManager object) {object.showPurchases();}
+    },
+
+    BALANCE {
+        public void action(BudgetManager object) {object.showBalance();}
+    },
+
     EXIT {
         @Override
         public void action(BudgetManager object) {

@@ -6,6 +6,7 @@ public class BudgetManager {
 
     private double balance;
     private double totalPurchases;
+    private boolean receivePurchasePrice = false;
 
     private ArrayList<String> expenses;
 
@@ -76,6 +77,9 @@ public class BudgetManager {
     private void performUserSelection(int userSelection){
         switch (userSelection) {
             case 1 -> state = States.ADD_INCOME;
+            case 2 -> state = States.ADD_PURCHASE;
+            case 3 -> state = States.SHOW_LIST_PURCHASES;
+            case 4 -> state = States.BALANCE;
             case 0 -> state = States.EXIT;
             default -> throw new NumberFormatException();
         }
@@ -101,41 +105,70 @@ public class BudgetManager {
 
     public void addPurchase() {
         if(!receiveInput) {
-            System.out.println("\nEnter purchase name: ");
+            if (!receivePurchasePrice) {
+                System.out.println("\nEnter purchase name: ");
+            } else {
+                System.out.println("Enter its price: ");
+            }
+            receiveInput = true;
         } else {
-            if (validatePurchaseFormat()) {
-                expenses.add(input);
-                state = States.SHOW_MENU;
+            if (!receivePurchasePrice) {
+                if (input == null || input.isBlank()) {
+                    System.out.println("Invalid input!");
+                } else {
+                    expenses.add(input);
+                    receivePurchasePrice = true;
+                }
+                receiveInput = false;
+            } else {
+                try {
+                    /* Caculate total purchases and new balance */
+                    double purchaseValue = Double.parseDouble(input);
+                    totalPurchases += purchaseValue;
+                    balance = balance - purchaseValue < 0 ? 0 : balance - purchaseValue;
+
+                    /* Add expense value to the list */
+                    int expenseIdx = expenses.size() - 1;
+                    String currentExpense = expenses.get(expenseIdx) + " $" + input;
+                    expenses.set(expenseIdx, currentExpense);
+                    System.out.println("Purchase was added!");
+
+                    /* Go to another state */
+                    state = States.SHOW_MENU;
+                    receivePurchasePrice = false;
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid input!");
+                }
+                finally {
+                    receiveInput = false;
+                }
             }
         }
     }
 
-    private boolean validatePurchaseFormat() {
-        if (input.isBlank() || !input.contains("$")) {
-            System.out.println("Invalid input!");
-            return false;
+    public void showPurchases() {
+        System.out.println();
+
+        if(expenses.isEmpty()) {
+            System.out.println("The purchase list is empty");
+        } else {
+            for (String purchase : expenses) {
+                System.out.println(purchase);
+            }
+
+            System.out.printf("Total sum: $%.2f\n", totalPurchases);
         }
 
-        int priceIdx = input.lastIndexOf('$');
+        state = States.SHOW_MENU;
+    }
 
-        try {
-            totalPurchases += Double.parseDouble(input.substring(priceIdx + 1));
-            return true;
-        } catch (NumberFormatException ex) {
-            System.out.println("Error on the value of the price!");
-            return false;
-        } catch (NullPointerException ex) {
-            System.out.println("Null input found");
-            return false;
-        } catch (ArrayIndexOutOfBoundsException ex) {
-            System.out.println("Not valid value for price was found");
-            return false;
-        }
+    public void showBalance() {
+        System.out.printf("\nBalance: $%.2f\n", balance);
+        state = States.SHOW_MENU;
     }
 
     public void exit() {
+        System.out.println("\nBye!");
         exitState = true;
     }
-
-
 }
