@@ -15,5 +15,6 @@ public class Main {
                 budgetManager.setInput(scan.nextLine());
             }
         }
+
     }
 }

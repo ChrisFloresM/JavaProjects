@@ -1,17 +1,23 @@
 package com.cfloresh.budgetmanager;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class BudgetManager {
 
     private MenuType menu = MenuType.MAIN;
 
     private double balance;
-    private double totalPurchases;
+    private double totalSum;
     private boolean receivePurchasePrice = false;
 
-    private ArrayList<Purchase> expenses;
-    private final ArrayList<ArrayList<Purchase>> purchaseTypes;
+    private List<Purchase> expenses;
+    private final Map<String, List<Purchase>> purchaseTypes;
+    private final Map<String, Double> purchaseTypesTotal;
+
+    private String currentKey;
 
     private States state;
 
@@ -37,16 +43,13 @@ public class BudgetManager {
 
     /* Class Constructor */
     public BudgetManager() {
-        purchaseTypes = new ArrayList<>();
-
-        purchaseTypes.add(new ArrayList<>());
-        purchaseTypes.add(new ArrayList<>());
-        purchaseTypes.add(new ArrayList<>());
-        purchaseTypes.add(new ArrayList<>());
+        purchaseTypes = new HashMap<>();
+        purchaseTypesTotal = new HashMap<>();
 
         state = States.SHOW_MENU;
         balance = 0;
-        totalPurchases = 0;
+        totalSum = 0;
+        currentKey = "Food";
     }
 
     /* State machine function */
@@ -70,12 +73,13 @@ public class BudgetManager {
     }
 
     private void performUserSelection(int userSelection){
+
         if (menu.equals(MenuType.MAIN)) {
             switch (userSelection) {
                 case 1 -> state = States.ADD_INCOME;
                 case 2 -> menu = MenuType.ADD_PURCHASE;
                 case 3 -> {
-                    if (purchaseTypeListIsEmpty()) {
+                    if (purchaseTypes.isEmpty()) {
                         System.out.println("\nThe purchase list is empty!");
                     } else {
                         menu = MenuType.SHOW_PURCHASE;
@@ -85,47 +89,52 @@ public class BudgetManager {
                 case 0 -> state = States.EXIT;
                 default -> throw new NumberFormatException();
             }
-
             return;
-        }
-
-        if (userSelection <= 0 ||
-                ((menu.equals(MenuType.SHOW_PURCHASE) && userSelection > 6)) ||
-                ((menu.equals(MenuType.ADD_PURCHASE) && userSelection > 5)) ){
-            throw new NumberFormatException();
-        }
-
-        if ((menu.equals(MenuType.SHOW_PURCHASE) && userSelection == 6) ||
-                (menu.equals(MenuType.ADD_PURCHASE) && userSelection == 5)) {
-            menu = MenuType.MAIN;
-            state = States.SHOW_MENU;
-            return;
-        }
-
-        if (userSelection <= 4) {
-            expenses = purchaseTypes.get(userSelection - 1);
         }
 
         if (menu.equals(MenuType.ADD_PURCHASE)) {
+           switch (userSelection) {
+               case 1, 2, 3, 4 -> selectKey(userSelection);
+               case 5 -> {
+                   backMainMenu();
+                   return;
+               }
+               default -> throw new NumberFormatException();
+           }
             state = States.ADD_PURCHASE;
 
-        } else {
-            if (userSelection == 5) {
-                showAllPurchases();
-            } else {
-                state = States.SHOW_LIST_PURCHASES;
+        } else if (menu.equals(MenuType.SHOW_PURCHASE)) {
+            switch (userSelection) {
+                case 1, 2, 3, 4 -> selectKey(userSelection);
+                case 5 ->  {
+                    showAllPurchases();
+                    state = States.SHOW_MENU;
+                    return;
+                }
+                case 6 -> {
+                    backMainMenu();
+                    return;
+                }
+                default -> throw new NumberFormatException();
             }
+            state = States.SHOW_LIST_PURCHASES;
         }
+
+        expenses = purchaseTypes.computeIfAbsent(currentKey, k -> new ArrayList<>());
     }
 
-    public boolean purchaseTypeListIsEmpty() {
-        for (ArrayList<Purchase> purchases : purchaseTypes) {
-            if (!purchases.isEmpty()) {
-                return false;
-            }
-        }
+    private void backMainMenu() {
+        menu = MenuType.MAIN;
+        state = States.SHOW_MENU;
+    }
 
-        return true;
+    private void selectKey(int input) {
+        switch (input) {
+            case 1 -> currentKey = "Food";
+            case 2 -> currentKey = "Clothes";
+            case 3 -> currentKey = "Entertainment";
+            case 4 -> currentKey = "Other";
+        }
     }
 
     public void addIncome() {
@@ -167,7 +176,9 @@ public class BudgetManager {
                 try {
                     /* Caculate total purchases and new balance */
                     double purchaseValue = Double.parseDouble(input);
-                    totalPurchases += purchaseValue;
+                    totalSum += purchaseValue;
+
+                    purchaseTypesTotal.merge(currentKey, purchaseValue, Double::sum);
                     balance = balance - purchaseValue < 0 ? 0 : balance - purchaseValue;
 
                     /* Add expense value to the list */
@@ -175,7 +186,6 @@ public class BudgetManager {
                     Purchase currentExpense = expenses.get(expenseIdx);
                     currentExpense.setPrice(purchaseValue);
                     currentExpense.generatePurchaseDescription();
-                    expenses.set(expenseIdx, currentExpense);
                     System.out.println("Purchase was added!");
 
                     /* Go to another state */
@@ -194,26 +204,27 @@ public class BudgetManager {
     public void showPurchases() {
         System.out.println();
 
+        System.out.println(currentKey + ":");
         if(expenses.isEmpty()) {
             System.out.println("The purchase list is empty");
         } else {
-
             for (Purchase purchase : expenses) {
                 System.out.println(purchase.getPurchaseDescription());
             }
-
-            System.out.printf("Total sum: $%.2f\n", totalPurchases);
+            System.out.printf("Total sum: $%.2f\n", purchaseTypesTotal.get(currentKey));
         }
 
         state = States.SHOW_MENU;
     }
 
     public void showAllPurchases() {
-        for (ArrayList<Purchase> purchases : purchaseTypes) {
+        System.out.println();
+        for (List<Purchase> purchases : purchaseTypes.values()) {
             for (Purchase purchase : purchases) {
                 System.out.println(purchase.getPurchaseDescription());
             }
         }
+        System.out.println("Total Sum: $" + totalSum);
     }
 
     public void showBalance() {
