@@ -35,6 +35,20 @@ public enum States {
         public void action(BudgetManager object) {
             object.exit();
         }
+    },
+
+    SAVE {
+        @Override
+        void action(BudgetManager object) {
+            object.savePurchases();
+        }
+    },
+
+    LOAD {
+        @Override
+        void action(BudgetManager object) {
+            object.loadPurchases();
+        }
     };
 
     abstract void action(BudgetManager object);

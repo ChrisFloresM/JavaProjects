@@ -8,6 +8,8 @@ public enum MenuType {
                 2) Add purchase
                 3) Show list of purchases
                 4) Balance
+                5) Save
+                6) Load
                 0) Exit
                 """),
 
@@ -34,7 +36,7 @@ public enum MenuType {
                 """
     );
 
-    private String body;
+    private final String body;
 
     MenuType(String body) {
         this.body = body;

@@ -26,6 +26,8 @@ public class BudgetManager {
 
     private boolean exitState = false;
 
+    private final FileManager fileManager;
+
     /* Getter and Setter for - receiveInput */
     public boolean isReceiveInput() {
         return this.receiveInput;
@@ -41,10 +43,13 @@ public class BudgetManager {
         return this.exitState;
     }
 
+
     /* Class Constructor */
     public BudgetManager() {
+        expenses = new ArrayList<>();
         purchaseTypes = new HashMap<>();
         purchaseTypesTotal = new HashMap<>();
+        fileManager = new FileManager();
 
         state = States.SHOW_MENU;
         balance = 0;
@@ -86,6 +91,8 @@ public class BudgetManager {
                     }
                 }
                 case 4 -> state = States.BALANCE;
+                case 5 -> state = States.SAVE;
+                case 6 -> state = States.LOAD;
                 case 0 -> state = States.EXIT;
                 default -> throw new NumberFormatException();
             }
@@ -93,14 +100,14 @@ public class BudgetManager {
         }
 
         if (menu.equals(MenuType.ADD_PURCHASE)) {
-           switch (userSelection) {
-               case 1, 2, 3, 4 -> selectKey(userSelection);
-               case 5 -> {
-                   backMainMenu();
-                   return;
-               }
-               default -> throw new NumberFormatException();
-           }
+            switch (userSelection) {
+                case 1, 2, 3, 4 -> selectKey(userSelection);
+                case 5 -> {
+                    backMainMenu();
+                    return;
+                }
+                default -> throw new NumberFormatException();
+            }
             state = States.ADD_PURCHASE;
 
         } else if (menu.equals(MenuType.SHOW_PURCHASE)) {
@@ -134,6 +141,7 @@ public class BudgetManager {
             case 2 -> currentKey = "Clothes";
             case 3 -> currentKey = "Entertainment";
             case 4 -> currentKey = "Other";
+            default -> System.out.println("Invalid key!");
         }
     }
 
@@ -155,6 +163,7 @@ public class BudgetManager {
         }
     }
 
+    /* TODO: update to be able to get input from the files */
     public void addPurchase() {
         if(!receiveInput) {
             if (!receivePurchasePrice) {
@@ -168,38 +177,48 @@ public class BudgetManager {
                 if (input == null || input.isBlank()) {
                     System.out.println("Invalid input!");
                 } else {
-                    expenses.add(new Purchase(input));
+                    createPurchase();
                     receivePurchasePrice = true;
                 }
                 receiveInput = false;
             } else {
-                try {
-                    /* Caculate total purchases and new balance */
-                    double purchaseValue = Double.parseDouble(input);
-                    totalSum += purchaseValue;
-
-                    purchaseTypesTotal.merge(currentKey, purchaseValue, Double::sum);
-                    balance = balance - purchaseValue < 0 ? 0 : balance - purchaseValue;
-
-                    /* Add expense value to the list */
-                    int expenseIdx = expenses.size() - 1;
-                    Purchase currentExpense = expenses.get(expenseIdx);
-                    currentExpense.setPrice(purchaseValue);
-                    currentExpense.generatePurchaseDescription();
-                    System.out.println("Purchase was added!");
-
-                    /* Go to another state */
-                    state = States.SHOW_MENU;
-                    receivePurchasePrice = false;
-                } catch (NumberFormatException e) {
-                    System.out.println("Invalid input!");
-                }
-                finally {
-                    receiveInput = false;
-                }
+                addPurchaseOperation();
+                System.out.println("Purchase was added!");
             }
         }
     }
+
+    public void createPurchase() {
+        Purchase currentPurchase = new Purchase(currentKey, input);
+        expenses.add(currentPurchase);
+    }
+
+    public void addPurchaseOperation() {
+        try {
+            /* Caculate total purchases and new balance */
+            double purchaseValue = Double.parseDouble(input);
+            totalSum += purchaseValue;
+
+            purchaseTypesTotal.merge(currentKey, purchaseValue, Double::sum);
+            balance = balance - purchaseValue < 0 ? 0 : balance - purchaseValue;
+
+            /* Add expense value to the list */
+            int expenseIdx = expenses.size() - 1;
+            Purchase currentExpense = expenses.get(expenseIdx);
+            currentExpense.setPrice(purchaseValue);
+            currentExpense.generatePurchaseDescription();
+
+            /* Go to another state */
+            state = States.SHOW_MENU;
+            receivePurchasePrice = false;
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input!");
+        }
+        finally {
+            receiveInput = false;
+        }
+    }
+
 
     public void showPurchases() {
         System.out.println();
@@ -209,7 +228,7 @@ public class BudgetManager {
             System.out.println("The purchase list is empty");
         } else {
             for (Purchase purchase : expenses) {
-                System.out.println(purchase.getPurchaseDescription());
+                System.out.println(purchase.toString());
             }
             System.out.printf("Total sum: $%.2f\n", purchaseTypesTotal.get(currentKey));
         }
@@ -221,10 +240,10 @@ public class BudgetManager {
         System.out.println();
         for (List<Purchase> purchases : purchaseTypes.values()) {
             for (Purchase purchase : purchases) {
-                System.out.println(purchase.getPurchaseDescription());
+                System.out.println(purchase.toString());
             }
         }
-        System.out.println("Total Sum: $" + totalSum);
+        System.out.println("Total Sum: $" + String.format("%.2f", totalSum));
     }
 
     public void showBalance() {
@@ -232,8 +251,102 @@ public class BudgetManager {
         state = States.SHOW_MENU;
     }
 
+    public void savePurchases() {
+
+        if(expenses.isEmpty()) {
+            System.out.println("\nThe purchase list is empty");
+            state = States.SHOW_MENU;
+            return;
+        }
+
+        fileManager.createFileRoute();
+        for (List<Purchase> purchases : purchaseTypes.values()) {
+            for (Purchase purchase : purchases) {
+                fileManager.writeToFile(purchase.getPurchaseDescription());
+            }
+        }
+        fileManager.writeToFile("Balance#Balance#" + balance);
+
+        System.out.println("\nPurchases were saved!");
+        state = States.SHOW_MENU;
+    }
+
+    public void loadPurchases() {
+        List<String> filePurchases = fileManager.getFromFile();
+        int listSize = filePurchases.size();
+
+        for (int i = 0; i < listSize; i++) {
+
+            String[] splitPurchase = filePurchases.get(i).split("#");
+
+            if (checkPurchaseFormatInvalid(splitPurchase)) {
+                System.out.println("\nThe file is empty or corrupted!");
+                state = States.SHOW_MENU;
+                return;
+            }
+
+            currentKey = splitPurchase[0];
+
+            if (i == listSize - 1) {
+                if (!currentKey.equals("Balance")) {
+                    System.out.println("\nThe file is corrupted!");
+                    state = States.SHOW_MENU;
+                    return;
+                }
+
+                balance = Double.parseDouble(splitPurchase[2]);
+                System.out.println("\nPurchases were loaded!");
+                state = States.SHOW_MENU;
+                return;
+            }
+
+            expenses = purchaseTypes.computeIfAbsent(currentKey, k -> new ArrayList<>());
+
+            input = splitPurchase[1];
+            createPurchase();
+
+            input = splitPurchase[2];
+            addPurchaseOperation();
+        }
+    }
+
+    private boolean checkPurchaseFormatInvalid(String[] inputLine) {
+
+        String[] validKeys = {"Food", "Clothes", "Entertainment", "Other", "Balance"};
+        boolean keyIsValid = false;
+
+        if (inputLine.length != 3) {
+            return true;
+        }
+
+        for(String key : validKeys) {
+            if (inputLine[0].equals(key)) {
+                keyIsValid = true;
+                break;
+            }
+        }
+
+        if(!keyIsValid) {
+            return true;
+        }
+
+        if (inputLine[1].isBlank()) {
+            return true;
+        }
+
+        try {
+            Double.parseDouble(inputLine[2]);
+        } catch (NumberFormatException e) {
+            return false;
+        }
+
+        return false;
+    }
+
     public void exit() {
         System.out.println("\nBye!");
         exitState = true;
     }
 }
+
+
