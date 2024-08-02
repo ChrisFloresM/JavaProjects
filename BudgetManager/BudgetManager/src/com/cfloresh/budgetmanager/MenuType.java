@@ -1,7 +1,12 @@
 package com.cfloresh.budgetmanager;
 
+import com.cfloresh.budgetmanager.strategies.menus.AddPurchaseMenu;
+import com.cfloresh.budgetmanager.strategies.menus.MainMenu;
+import com.cfloresh.budgetmanager.strategies.menus.Menu;
+import com.cfloresh.budgetmanager.strategies.menus.ShowPurchaseMenu;
+
 public enum MenuType {
-    MAIN ("""
+    MAIN (new MainMenu(), """
                
                 Choose your action:
                 1) Add income
@@ -13,7 +18,7 @@ public enum MenuType {
                 0) Exit
                 """),
 
-    ADD_PURCHASE ("""
+    ADD_PURCHASE (new AddPurchaseMenu(), """
                
                 Choose the type of purchase:
                 1) Food
@@ -24,7 +29,7 @@ public enum MenuType {
                 """
     ),
 
-    SHOW_PURCHASE ("""
+    SHOW_PURCHASE (new ShowPurchaseMenu(),"""
                
                 Choose the type of purchase:
                 1) Food
@@ -37,12 +42,18 @@ public enum MenuType {
     );
 
     private final String body;
+    private final Menu menuStrategy;
 
-    MenuType(String body) {
+    MenuType(Menu menuStrategy, String body) {
+        this.menuStrategy = menuStrategy;
         this.body = body;
     }
 
     public String getBody() {
         return body;
+    }
+
+    public void performAction(BudgetManager object, int value) {
+        menuStrategy.performAction(object, value);
     }
 }

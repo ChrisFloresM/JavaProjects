@@ -43,6 +43,15 @@ public class BudgetManager {
         return this.exitState;
     }
 
+    /* Setter for state */
+    public void setState(States state) {
+        this.state = state;
+    }
+
+    /* Setter for Menu */
+    public void setMenu(MenuType menu) {
+        this.menu = menu;
+    }
 
     /* Class Constructor */
     public BudgetManager() {
@@ -68,7 +77,8 @@ public class BudgetManager {
             receiveInput = true;
         } else {
             try {
-                performUserSelection(Integer.parseInt(input));
+                menu.performAction(this, Integer.parseInt(input));
+                expenses = purchaseTypes.computeIfAbsent(currentKey, k -> new ArrayList<>());
             } catch (NumberFormatException e) {
                 System.out.println("Invalid input!");
             } finally {
@@ -77,65 +87,20 @@ public class BudgetManager {
         }
     }
 
-    private void performUserSelection(int userSelection){
-
-        if (menu.equals(MenuType.MAIN)) {
-            switch (userSelection) {
-                case 1 -> state = States.ADD_INCOME;
-                case 2 -> menu = MenuType.ADD_PURCHASE;
-                case 3 -> {
-                    if (purchaseTypes.isEmpty()) {
-                        System.out.println("\nThe purchase list is empty!");
-                    } else {
-                        menu = MenuType.SHOW_PURCHASE;
-                    }
-                }
-                case 4 -> state = States.BALANCE;
-                case 5 -> state = States.SAVE;
-                case 6 -> state = States.LOAD;
-                case 0 -> state = States.EXIT;
-                default -> throw new NumberFormatException();
-            }
-            return;
+    public void checkPurchaseMapEmpty() {
+        if (purchaseTypes.isEmpty()) {
+            System.out.println("\nThe purchase list is empty!");
+        } else {
+            menu = MenuType.SHOW_PURCHASE;
         }
-
-        if (menu.equals(MenuType.ADD_PURCHASE)) {
-            switch (userSelection) {
-                case 1, 2, 3, 4 -> selectKey(userSelection);
-                case 5 -> {
-                    backMainMenu();
-                    return;
-                }
-                default -> throw new NumberFormatException();
-            }
-            state = States.ADD_PURCHASE;
-
-        } else if (menu.equals(MenuType.SHOW_PURCHASE)) {
-            switch (userSelection) {
-                case 1, 2, 3, 4 -> selectKey(userSelection);
-                case 5 ->  {
-                    showAllPurchases();
-                    state = States.SHOW_MENU;
-                    return;
-                }
-                case 6 -> {
-                    backMainMenu();
-                    return;
-                }
-                default -> throw new NumberFormatException();
-            }
-            state = States.SHOW_LIST_PURCHASES;
-        }
-
-        expenses = purchaseTypes.computeIfAbsent(currentKey, k -> new ArrayList<>());
     }
 
-    private void backMainMenu() {
+    public void backMainMenu() {
         menu = MenuType.MAIN;
         state = States.SHOW_MENU;
     }
 
-    private void selectKey(int input) {
+    public void selectKey(int input) {
         switch (input) {
             case 1 -> currentKey = "Food";
             case 2 -> currentKey = "Clothes";
@@ -163,7 +128,6 @@ public class BudgetManager {
         }
     }
 
-    /* TODO: update to be able to get input from the files */
     public void addPurchase() {
         if(!receiveInput) {
             if (!receivePurchasePrice) {
@@ -326,7 +290,7 @@ public class BudgetManager {
             }
         }
 
-        if(!keyIsValid) {
+        if(!keyIsValid) {  
             return true;
         }
 
