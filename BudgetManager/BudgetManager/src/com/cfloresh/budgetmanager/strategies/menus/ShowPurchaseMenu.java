@@ -3,7 +3,7 @@ package com.cfloresh.budgetmanager.strategies.menus;
 import com.cfloresh.budgetmanager.BudgetManager;
 import com.cfloresh.budgetmanager.States;
 
-public class ShowPurchaseMenu implements Menu{
+public class ShowPurchaseMenu implements Menu {
     @Override
     public void performAction(BudgetManager object, int value) {
         switch (value) {

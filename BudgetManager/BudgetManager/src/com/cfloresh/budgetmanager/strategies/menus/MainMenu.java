@@ -14,6 +14,9 @@ public class MainMenu implements Menu {
             case 4 -> object.setState(States.BALANCE);
             case 5 -> object.setState(States.SAVE);
             case 6 -> object.setState(States.LOAD);
+            case 7 -> {
+                object.setMenu(MenuType.ANALYZE);
+            }
             case 0 -> object.setState(States.EXIT);
             default -> throw new NumberFormatException();
         }

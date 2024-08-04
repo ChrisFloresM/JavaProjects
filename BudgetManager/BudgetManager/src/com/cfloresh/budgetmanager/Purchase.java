@@ -25,6 +25,8 @@ public class Purchase {
         return purchaseDescription;
     }
 
+    public double getPurchasePrice() { return price; }
+
     @Override
     public String toString() {
         return String.format("%s $%.2f", concept, price);

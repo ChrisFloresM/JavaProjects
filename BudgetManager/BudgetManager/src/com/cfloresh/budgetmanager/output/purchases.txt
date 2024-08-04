@@ -1,4 +1,5 @@
+Other#Medical care#597.000000
 Entertainment#Cinema#345.000000
 Food#Almond 250g#35.500000
 Food#nuts#12.990000
-Balance#Balance#606.51
+Balance#Balance#9.509999999999991

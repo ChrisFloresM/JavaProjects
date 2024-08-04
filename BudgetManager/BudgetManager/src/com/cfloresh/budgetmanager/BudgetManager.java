@@ -1,9 +1,8 @@
 package com.cfloresh.budgetmanager;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.cfloresh.budgetmanager.strategies.sort.SortingStrategy;
+
+import java.util.*;
 
 public class BudgetManager {
 
@@ -13,12 +12,11 @@ public class BudgetManager {
     private double totalSum;
     private boolean receivePurchasePrice = false;
 
-    private List<Purchase> expenses;
-    private final Map<String, List<Purchase>> purchaseTypes;
-    private final Map<String, Double> purchaseTypesTotal;
+    private PurchaseTypeEntry expenses;
+    private final List<Purchase> allPurchases;
+    private final Map<String, PurchaseTypeEntry> purchasesByType;
 
     private String currentKey;
-
     private States state;
 
     private boolean receiveInput = false;
@@ -27,6 +25,8 @@ public class BudgetManager {
     private boolean exitState = false;
 
     private final FileManager fileManager;
+
+    private SortingStrategy sortingStrategy;
 
     /* Getter and Setter for - receiveInput */
     public boolean isReceiveInput() {
@@ -53,17 +53,41 @@ public class BudgetManager {
         this.menu = menu;
     }
 
+    public PurchaseTypeEntry getExpenses() {
+        return expenses;
+    }
+
+    public List<Purchase> getAllPurchases() {
+        return allPurchases;
+    }
+
+    public Map<String, PurchaseTypeEntry> getPurchasesByType() {
+        return purchasesByType;
+    }
+
+    public void setSortingStrategy(SortingStrategy sortingStrategy) {
+        this.sortingStrategy = sortingStrategy;
+    }
+
     /* Class Constructor */
     public BudgetManager() {
-        expenses = new ArrayList<>();
-        purchaseTypes = new HashMap<>();
-        purchaseTypesTotal = new HashMap<>();
+        expenses = new PurchaseTypeEntry(new ArrayList<>());
+        allPurchases = new ArrayList<>();
+        purchasesByType = new LinkedHashMap<>();
         fileManager = new FileManager();
+        initializePurchases();
 
         state = States.SHOW_MENU;
         balance = 0;
         totalSum = 0;
         currentKey = "Food";
+    }
+
+    private void initializePurchases() {
+        purchasesByType.put("Food", new PurchaseTypeEntry(new ArrayList<>()));
+        purchasesByType.put("Entertainment", new PurchaseTypeEntry(new ArrayList<>()));
+        purchasesByType.put("Clothes", new PurchaseTypeEntry(new ArrayList<>()));
+        purchasesByType.put("Other", new PurchaseTypeEntry(new ArrayList<>()));
     }
 
     /* State machine function */
@@ -78,7 +102,7 @@ public class BudgetManager {
         } else {
             try {
                 menu.performAction(this, Integer.parseInt(input));
-                expenses = purchaseTypes.computeIfAbsent(currentKey, k -> new ArrayList<>());
+                expenses = purchasesByType.computeIfAbsent(currentKey, k -> new PurchaseTypeEntry(new ArrayList<>()));
             } catch (NumberFormatException e) {
                 System.out.println("Invalid input!");
             } finally {
@@ -88,7 +112,7 @@ public class BudgetManager {
     }
 
     public void checkPurchaseMapEmpty() {
-        if (purchaseTypes.isEmpty()) {
+        if (allPurchases.isEmpty()) {
             System.out.println("\nThe purchase list is empty!");
         } else {
             menu = MenuType.SHOW_PURCHASE;
@@ -154,7 +178,8 @@ public class BudgetManager {
 
     public void createPurchase() {
         Purchase currentPurchase = new Purchase(currentKey, input);
-        expenses.add(currentPurchase);
+        expenses.addToList(currentPurchase);
+        allPurchases.add(currentPurchase);
     }
 
     public void addPurchaseOperation() {
@@ -163,12 +188,12 @@ public class BudgetManager {
             double purchaseValue = Double.parseDouble(input);
             totalSum += purchaseValue;
 
-            purchaseTypesTotal.merge(currentKey, purchaseValue, Double::sum);
+            expenses.increasePurchasesTotal(purchaseValue);
             balance = balance - purchaseValue < 0 ? 0 : balance - purchaseValue;
 
             /* Add expense value to the list */
-            int expenseIdx = expenses.size() - 1;
-            Purchase currentExpense = expenses.get(expenseIdx);
+            int expenseIdx = expenses.getPurchasesList().size() - 1;
+            Purchase currentExpense = expenses.getPurchasesList().get(expenseIdx);
             currentExpense.setPrice(purchaseValue);
             currentExpense.generatePurchaseDescription();
 
@@ -183,29 +208,33 @@ public class BudgetManager {
         }
     }
 
-
     public void showPurchases() {
         System.out.println();
 
+        if (state.equals(States.ANALYZE) && expenses.getPurchasesList().isEmpty()) {
+            System.out.println("The purchase list is empty");
+            return;
+        }
+
         System.out.println(currentKey + ":");
-        if(expenses.isEmpty()) {
+        if(expenses.getPurchasesList().isEmpty()) {
             System.out.println("The purchase list is empty");
         } else {
-            for (Purchase purchase : expenses) {
+            for (Purchase purchase : expenses.getPurchasesList()) {
                 System.out.println(purchase.toString());
             }
-            System.out.printf("Total sum: $%.2f\n", purchaseTypesTotal.get(currentKey));
+            System.out.printf("Total sum: $%.2f\n", expenses.getPurchasesTotal());
         }
 
         state = States.SHOW_MENU;
     }
 
     public void showAllPurchases() {
-        System.out.println();
-        for (List<Purchase> purchases : purchaseTypes.values()) {
-            for (Purchase purchase : purchases) {
-                System.out.println(purchase.toString());
-            }
+        if (!state.equals(States.ANALYZE)) {
+            System.out.println();
+        }
+        for (Purchase purchase : allPurchases) {
+            System.out.println(purchase.toString());
         }
         System.out.println("Total Sum: $" + String.format("%.2f", totalSum));
     }
@@ -217,18 +246,18 @@ public class BudgetManager {
 
     public void savePurchases() {
 
-        if(expenses.isEmpty()) {
+        if (allPurchases.isEmpty()) {
             System.out.println("\nThe purchase list is empty");
             state = States.SHOW_MENU;
             return;
         }
 
         fileManager.createFileRoute();
-        for (List<Purchase> purchases : purchaseTypes.values()) {
-            for (Purchase purchase : purchases) {
-                fileManager.writeToFile(purchase.getPurchaseDescription());
-            }
+
+        for (Purchase purchase : allPurchases) {
+            fileManager.writeToFile(purchase.getPurchaseDescription());
         }
+
         fileManager.writeToFile("Balance#Balance#" + balance);
 
         System.out.println("\nPurchases were saved!");
@@ -238,6 +267,14 @@ public class BudgetManager {
     public void loadPurchases() {
         List<String> filePurchases = fileManager.getFromFile();
         int listSize = filePurchases.size();
+
+        /* Clear in case previous input were added to avoid re-load already loaded elements */
+        if (!allPurchases.isEmpty()) {
+            balance = 0;
+            purchasesByType.clear();
+            allPurchases.clear();
+
+        }
 
         for (int i = 0; i < listSize; i++) {
 
@@ -261,10 +298,11 @@ public class BudgetManager {
                 balance = Double.parseDouble(splitPurchase[2]);
                 System.out.println("\nPurchases were loaded!");
                 state = States.SHOW_MENU;
+                currentKey = "Food"; //Default value in order to avoid adding a "Balance" key on the map
                 return;
             }
 
-            expenses = purchaseTypes.computeIfAbsent(currentKey, k -> new ArrayList<>());
+            expenses = purchasesByType.computeIfAbsent(currentKey, k -> new PurchaseTypeEntry(new ArrayList<>()));
 
             input = splitPurchase[1];
             createPurchase();
@@ -290,7 +328,7 @@ public class BudgetManager {
             }
         }
 
-        if(!keyIsValid) {  
+        if(!keyIsValid) {
             return true;
         }
 
@@ -311,6 +349,13 @@ public class BudgetManager {
         System.out.println("\nBye!");
         exitState = true;
     }
+
+    /* Method analyze corresponding to final stage of the project */
+    public void analyze() {
+        sortingStrategy.sort(this);
+        state = States.SHOW_MENU;
+    }
+
 }
 
 
