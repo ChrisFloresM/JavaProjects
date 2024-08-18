@@ -3,6 +3,8 @@ package com.cfloresh.mealplanner;
 import com.cfloresh.mealplanner.enumerations.States;
 import static com.cfloresh.mealplanner.enumerations.States.*;
 
+import com.cfloresh.mealplanner.database.DataBaseManager;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,6 +36,9 @@ public class MealPlanner {
         meals = new ArrayList<>();
         readInput = false;
         exit = false;
+
+        DataBaseManager.createMealsTable();
+        DataBaseManager.createIngredientsTable();
     }
 
     /* Setter for userInput */
@@ -129,6 +134,7 @@ public class MealPlanner {
 
     private void createNewMeal() {
         meals.add(new Meal(currentMealCategory, currentMealName, currentMealIngredients));
+        DataBaseManager.insertMealsData(currentMealCategory, currentMealName, Meal.getMealID());
         System.out.println("The meal has been addeed!");
     }
 
