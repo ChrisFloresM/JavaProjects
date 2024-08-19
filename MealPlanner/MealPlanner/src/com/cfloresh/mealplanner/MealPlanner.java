@@ -2,17 +2,11 @@ package com.cfloresh.mealplanner;
 
 import com.cfloresh.mealplanner.enumerations.States;
 import static com.cfloresh.mealplanner.enumerations.States.*;
-
 import com.cfloresh.mealplanner.database.DataBaseManager;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class MealPlanner {
 
     /*************************************** Instance Fields ***************************************/
-
-    private final List<Meal> meals;
 
     /* Input related fields */
     private boolean readInput;
@@ -25,6 +19,7 @@ public class MealPlanner {
     String regex;
 
     /* Meal related fields*/
+    private Meal currentMeal;
     private String currentMealName;
     private String[] currentMealIngredients;
     private String currentMealCategory;
@@ -33,12 +28,11 @@ public class MealPlanner {
     /* Constructor */
     public MealPlanner() {
         state = MAIN_STATE;
-        meals = new ArrayList<>();
         readInput = false;
         exit = false;
 
-        DataBaseManager.createMealsTable();
-        DataBaseManager.createIngredientsTable();
+        DataBaseManager.createTables();
+        DataBaseManager.getLastIdsValues();
     }
 
     /* Setter for userInput */
@@ -109,10 +103,13 @@ public class MealPlanner {
             switch (state) {
                 case MAIN_STATE -> nextState = States.valueOf(userInput.toUpperCase());
                 case ADD -> currentMealCategory = userInput;
-                case GET_MEAL_NAME -> currentMealName = userInput;
+                case GET_MEAL_NAME -> {
+                    currentMealName = userInput;
+                    createNewMeal();
+                }
                 case GET_MEAL_INGREDIENTS -> {
                     currentMealIngredients = userInput.split(",\\s");
-                    createNewMeal();
+                    addMealIngredients();
                 }
                 default -> System.out.println("Invalid State!!");
             }
@@ -133,42 +130,28 @@ public class MealPlanner {
     }
 
     private void createNewMeal() {
-        meals.add(new Meal(currentMealCategory, currentMealName, currentMealIngredients));
-        DataBaseManager.insertMealsData(currentMealCategory, currentMealName, Meal.getMealID());
-        System.out.println("The meal has been addeed!");
+        currentMeal = new Meal(currentMealCategory, currentMealName);
+    }
+
+    private void addMealIngredients() {
+        for (String ingredient : currentMealIngredients) {
+            currentMeal.addIngredient(ingredient);
+        }
+        saveToDatabase();
+    }
+
+    private void saveToDatabase() {
+        DataBaseManager.insertMealsData(currentMeal.getCategory(), currentMeal.getName(), currentMeal.getMealID());
+
+        for (Ingredient ingredient: currentMeal.getIngredients()) {
+            DataBaseManager.insertIngredientsData(ingredient.getName(), ingredient.getIngredientID(), ingredient.getMeal_id());
+        }
+
+        System.out.println("The meal has been added!");
     }
 
     public void printMeals() {
-        if (meals.isEmpty()) {
-            System.out.println("No meals saved. Add a meal first.");
-            backMainMenu();
-            return;
-        }
-
-        for (Meal meal : meals) {
-            printMeal(meal);
-        }
-
-        System.out.println();
-    }
-
-    public void printMeal(Meal meal) {
-        String[] ingredients = meal.getIngredients();
-        StringBuilder buildIngredientsString = new StringBuilder();
-
-        for (String ingredient : ingredients) {
-            buildIngredientsString.append(ingredient).append("\n");
-        }
-
-        String ingredientsString = buildIngredientsString.toString();
-
-        String output = String.format(
-                "\nCategory: %s\n" +
-                        "Name: %s\n" +
-                        "Ingredients:\n%s", meal.getCategory(), meal.getName(), ingredientsString);
-
-
-        System.out.print(output);
+        DataBaseManager.readMealsData();
     }
 
     public void backMainMenu() {

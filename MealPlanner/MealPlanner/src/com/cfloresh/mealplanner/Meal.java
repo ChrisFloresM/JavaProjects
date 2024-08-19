@@ -1,18 +1,24 @@
 package com.cfloresh.mealplanner;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Meal {
 
     private final String category;
     private final String name;
-    private final String[] ingredients;
+    private final List<Ingredient> ingredients;
+    private final int mealID;
 
-    private static int mealID = 0;
+    private static int currentMealID = 0;
 
-    public Meal(String category, String name, String[] ingredients) {
+    public Meal(String category, String name) {
         this.category = category;
         this.name = name;
-        this.ingredients = ingredients;
-        mealID++;
+        this.ingredients = new ArrayList<>();
+
+        currentMealID++;
+        this.mealID = currentMealID;
     }
 
     public String getCategory() {
@@ -23,15 +29,19 @@ public class Meal {
         return name;
     }
 
-    public String[] getIngredients() {
-        return ingredients;
-    }
-
-    public static int getMealID() {
+    public int getMealID() {
         return mealID;
     }
 
-    public static void setMealID(int mealID) {
-        Meal.mealID = mealID;
+    public List<Ingredient> getIngredients() {
+        return ingredients;
+    }
+
+    public void addIngredient(String ingredient) {
+        ingredients.add(new Ingredient(ingredient, mealID));
+    }
+
+    public static void setCurrentMealID(int currentMealID) {
+        Meal.currentMealID = currentMealID;
     }
 }

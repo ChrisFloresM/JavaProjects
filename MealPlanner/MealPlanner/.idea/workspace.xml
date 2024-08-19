@@ -5,19 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6330c95f-9874-4373-8c33-e2944982c386" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sqldialects.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/uiDesigner.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/MealPlanner.iml" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/com/cfloresh/mealplanner/Ingredient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/cfloresh/mealplanner/Meal.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/cfloresh/mealplanner/Meal.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/cfloresh/mealplanner/MealPlanner.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/cfloresh/mealplanner/MealPlanner.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/cfloresh/mealplanner/database/DataBaseManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/cfloresh/mealplanner/database/DataBaseManager.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -143,7 +135,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1724015070645</updated>
-      <workItem from="1724015071502" duration="2489000" />
+      <workItem from="1724015071502" duration="12342000" />
     </task>
     <servers />
   </component>
