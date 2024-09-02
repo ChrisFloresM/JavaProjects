@@ -5,11 +5,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6330c95f-9874-4373-8c33-e2944982c386" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/com/cfloresh/mealplanner/Ingredient.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/com/cfloresh/mealplanner/enumerations/MealCategory.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/com/cfloresh/mealplanner/enumerations/WeekDay.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/a8296051-e3dd-4b27-99d8-174e19377340.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/a8296051-e3dd-4b27-99d8-174e19377340.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/a8296051-e3dd-4b27-99d8-174e19377340/storage_v2/_src_/database/meals_db.DTJjxQ/schema/public.abK9xQ.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/a8296051-e3dd-4b27-99d8-174e19377340/storage_v2/_src_/database/meals_db.DTJjxQ/schema/public.abK9xQ.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/cfloresh/mealplanner/Meal.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/cfloresh/mealplanner/Meal.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/app/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/cfloresh/mealplanner/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/cfloresh/mealplanner/Main.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/cfloresh/mealplanner/MealPlanner.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/cfloresh/mealplanner/MealPlanner.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/cfloresh/mealplanner/database/DataBaseManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/cfloresh/mealplanner/database/DataBaseManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/cfloresh/mealplanner/enumerations/States.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/cfloresh/mealplanner/enumerations/States.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -41,17 +47,19 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
+        <option value="Interface" />
         <option value="Class" />
+        <option value="Enum" />
       </list>
     </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "customColor": "",
-  "associatedIndex": 8
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 8
+}</component>
   <component name="ProjectId" id="2kqdWC3NxqQhIK0WV4drRt2FzZo" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -65,7 +73,7 @@
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "git-widget-placeholder": "master",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/terry/Desktop/Code/PostgreSQLExcercises/Excercise_1/PostgreExcercise_1",
+    "last_opened_file_path": "C:/Users/terry/Desktop/Code/JavaProjects/MealPlanner/MealPlanner",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -135,11 +143,24 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1724015070645</updated>
-      <workItem from="1724015071502" duration="12342000" />
+      <workItem from="1724015071502" duration="14549000" />
+      <workItem from="1724128070343" duration="1967000" />
+      <workItem from="1724512851308" duration="7077000" />
+      <workItem from="1724717128447" duration="11043000" />
+      <workItem from="1725121654525" duration="4449000" />
+      <workItem from="1725255091523" duration="2155000" />
+      <workItem from="1725301037493" duration="8220000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="XDebuggerManager">
+    <watches-manager>
+      <configuration name="GradleRunConfiguration">
+        <watch expression="resultSet" />
+      </configuration>
+    </watches-manager>
   </component>
 </project>

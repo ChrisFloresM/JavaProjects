@@ -54,5 +54,5 @@ tasks.named('test') {
 }
 
 tasks.named('run') {
-    standardInput = System.in
+    standardInput = System.in;
 }

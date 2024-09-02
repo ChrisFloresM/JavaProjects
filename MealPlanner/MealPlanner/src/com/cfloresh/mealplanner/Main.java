@@ -8,13 +8,11 @@ public class Main {
         Scanner scan = new Scanner(System.in);
         MealPlanner mealPlanner = new MealPlanner();
 
-
         while (!mealPlanner.isExit()) {
             mealPlanner.stateMachine();
             if (mealPlanner.isReadInput()) {
                 mealPlanner.setUserInput(scan.nextLine());
             }
         }
-
     }
 }

@@ -1,8 +1,13 @@
 package com.cfloresh.mealplanner;
 
+import com.cfloresh.mealplanner.enumerations.MealCategory;
 import com.cfloresh.mealplanner.enumerations.States;
 import static com.cfloresh.mealplanner.enumerations.States.*;
 import com.cfloresh.mealplanner.database.DataBaseManager;
+import com.cfloresh.mealplanner.enumerations.WeekDay;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MealPlanner {
 
@@ -15,8 +20,6 @@ public class MealPlanner {
     /* State related fields */
     private States state;
     private boolean exit;
-    String stateMessage;
-    String regex;
 
     /* Meal related fields*/
     private Meal currentMeal;
@@ -24,12 +27,25 @@ public class MealPlanner {
     private String[] currentMealIngredients;
     private String currentMealCategory;
 
+    /* Regex used multiple times */
+    private final String menuOptionsRegex = "(breakfast|lunch|dinner)";
+    private final String mealNameRegex = "^[a-zA-Z]{3,}[^\\d]*";
+
+    /* Variables used for planning state */
+    private WeekDay currentPlanDay;
+    private MealCategory currentPlanCategory;
+    private boolean planCleaned;
+
     /*************************************** Constructor / Getters / Setters ***************************************/
     /* Constructor */
     public MealPlanner() {
         state = MAIN_STATE;
         readInput = false;
         exit = false;
+        planCleaned = false;
+
+        currentPlanDay = WeekDay.MONDAY;
+        currentPlanCategory = MealCategory.BREAKFAST;
 
         DataBaseManager.createTables();
         DataBaseManager.getLastIdsValues();
@@ -57,21 +73,18 @@ public class MealPlanner {
     }
 
     public void mainState() {
-        String regex = "(add|show|exit)";
+        String regex = "(add|show|plan|list plan|exit)";
 
         genericStateAction(state.getStateMessage(), regex, MAIN_STATE);
     }
 
     public void addState() {
-        String regex = "(breakfast|lunch|dinner)";
-
-        genericStateAction(state.getStateMessage(), regex, GET_MEAL_NAME);
+        genericStateAction(state.getStateMessage(), menuOptionsRegex, GET_MEAL_NAME);
     }
 
     public void getMealName() {
-        String regex = "^[a-zA-Z]{3,}[^\\d]*";
 
-        genericStateAction(state.getStateMessage(), regex, GET_MEAL_INGREDIENTS);
+        genericStateAction(state.getStateMessage(), mealNameRegex, GET_MEAL_INGREDIENTS);
     }
 
     public void getMealIngredients() {
@@ -81,7 +94,34 @@ public class MealPlanner {
     }
 
     public void showState() {
-        printMeals();
+        genericStateAction(state.getStateMessage(), menuOptionsRegex, MAIN_STATE);
+    }
+
+    public void planState() {
+
+        clearPlan();
+
+        if (!readInput) {
+            if(showCategoryMeals()) {
+                buildStateMessage();
+            } else {
+                System.out.println("No meals found for category: " + currentPlanCategory.getCategoryName());
+                backMainMenu();
+                return;
+            }
+
+        }
+
+        genericStateAction(state.getStateMessage(), mealNameRegex, PLAN);
+    }
+
+    public void listPlan() {
+        if (DataBaseManager.planIsNotEmpty()) {
+            showWeekPlan();
+        } else {
+            System.out.println("Database does not contain any meal plans");
+        }
+
         backMainMenu();
     }
 
@@ -98,10 +138,12 @@ public class MealPlanner {
             return;
         }
 
+        readInput = false;
         if (validateInput(regex)) {
-
             switch (state) {
-                case MAIN_STATE -> nextState = States.valueOf(userInput.toUpperCase());
+                case MAIN_STATE -> {
+                    nextState = userInput.equals("list plan") ? LIST_PLAN : States.valueOf(userInput.toUpperCase());
+                }
                 case ADD -> currentMealCategory = userInput;
                 case GET_MEAL_NAME -> {
                     currentMealName = userInput;
@@ -111,12 +153,14 @@ public class MealPlanner {
                     currentMealIngredients = userInput.split(",\\s");
                     addMealIngredients();
                 }
+                case SHOW -> printMeals();
+                case PLAN -> {
+                    nextState = setPlanForCurrentDay();
+                }
                 default -> System.out.println("Invalid State!!");
             }
-
             state = nextState;
         }
-        readInput = false;
     }
 
     private boolean validateInput(String regex) {
@@ -151,7 +195,7 @@ public class MealPlanner {
     }
 
     public void printMeals() {
-        DataBaseManager.readMealsData();
+        DataBaseManager.readMealsData(userInput);
     }
 
     public void backMainMenu() {
@@ -159,4 +203,80 @@ public class MealPlanner {
         readInput = false;
     }
 
+    private void buildStateMessage() {
+        if (state != PLAN) {
+            System.out.println("Error state! You shouldn't be here!");
+            backMainMenu();
+            return;
+        }
+
+        String currentDay = currentPlanDay.getDayName();
+        String currentCategory = currentPlanCategory.getCategoryName();
+
+        state.setStateMessage(String.format("Choose the %s for %s from the list above:", currentCategory, currentDay));
+    }
+
+    private boolean showCategoryMeals() {
+        /* Look into the data base for all the meals for the current meal category and print it ordered alphabetically */
+        return DataBaseManager.getMealsByCategory(currentPlanCategory.getCategoryName(), currentPlanDay.getDayName());
+    }
+
+    private States setPlanForCurrentDay() {
+        States nextState = PLAN;
+
+        if (DataBaseManager.mealExistInTable(currentPlanCategory.getCategoryName(), userInput)) {
+            int mealId = DataBaseManager.getMealId(currentPlanCategory.getCategoryName(), userInput);
+            DataBaseManager.insertPlanData(currentPlanDay.getDayName(), userInput, currentPlanCategory.getCategoryName(), mealId);
+        } else {
+            System.out.println("This meal doesn’t exist. Choose a meal from the list above.");
+            readInput = true;
+            return nextState;
+        }
+
+        /* Move to the next day IF the current plan category is Dinner */
+        if (currentPlanCategory.equals(MealCategory.DINNER)){
+            System.out.printf("Yeah! We planned the meals for %s.%n", currentPlanDay.getDayName());
+            currentPlanDay = currentPlanDay.nextDay();
+
+            if(currentPlanDay.equals(WeekDay.MONDAY)){
+                showWeekPlan();
+                backMainMenu();
+                planCleaned = false;
+                nextState = MAIN_STATE;
+            }
+        }
+
+        /* Move to the next category */
+        currentPlanCategory = currentPlanCategory.nextCategory();
+
+        return nextState;
+    }
+
+    public void clearPlan() {
+        if (!planCleaned) {
+            DataBaseManager.clearPlan();
+            planCleaned = true;
+        }
+    }
+
+    private void showWeekPlan() {
+        WeekDay currentDay = WeekDay.MONDAY;
+        Map<String, String> dayPlan;
+        boolean exitLoop = false;
+        System.out.println();
+
+        while (!exitLoop) {
+            dayPlan = DataBaseManager.getDayPlan(currentDay.getDayName());
+
+            System.out.println(currentDay.getDayName());
+            for (Map.Entry<String, String> entry : dayPlan.entrySet()) {
+                System.out.println(entry.getKey() + ": " + entry.getValue());
+            }
+
+            System.out.println();
+            currentDay = currentDay.nextDay();
+
+            exitLoop = currentDay == WeekDay.MONDAY;
+        }
+    }
 }

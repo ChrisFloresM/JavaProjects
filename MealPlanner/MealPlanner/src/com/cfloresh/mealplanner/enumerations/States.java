@@ -3,7 +3,7 @@ package com.cfloresh.mealplanner.enumerations;
 import com.cfloresh.mealplanner.MealPlanner;
 
 public enum States {
-    MAIN_STATE ("What would you like to do (add, show, exit)?", "What would you like to do (add, show, exit)?") {
+    MAIN_STATE ("What would you like to do (add, show, plan, list plan, exit)?", "What would you like to do (add, show, exit)?") {
         public void performAction(MealPlanner mealPlanner) {
             mealPlanner.mainState();
         }
@@ -21,15 +21,27 @@ public enum States {
         }
     },
 
-    GET_MEAL_INGREDIENTS("Input the meal's ingredients:", "Wrong format. Use letters only!") {
+    GET_MEAL_INGREDIENTS("Input the ingredients:", "Wrong format. Use letters only!") {
         public void performAction(MealPlanner mealPlanner) {
             mealPlanner.getMealIngredients();
         }
     },
 
-    SHOW(null, null) {
+    SHOW("Which category do you want to print (breakfast, lunch, dinner)?", "Wrong meal category! Choose from: breakfast, lunch, dinner.") {
         public void performAction(MealPlanner mealPlanner) {
             mealPlanner.showState();
+        }
+    },
+
+    PLAN("Choose the breakfast for Monday from the list above:", "Wrong format. Use letters only!") {
+        public void performAction(MealPlanner mealPlanner) {
+            mealPlanner.planState();
+        }
+    },
+
+    LIST_PLAN(null, null) {
+        public void performAction(MealPlanner mealPlanner) {
+            mealPlanner.listPlan();
         }
     },
 
@@ -59,6 +71,10 @@ public enum States {
 
     public void setErrorStateMessage() {
         this.stateMessage = errorMessage;
+    }
+
+    public void setStateMessage(String stateMessage) {
+        this.stateMessage = stateMessage;
     }
 
     abstract public void performAction(MealPlanner object);
