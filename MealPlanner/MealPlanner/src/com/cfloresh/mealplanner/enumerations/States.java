@@ -3,7 +3,7 @@ package com.cfloresh.mealplanner.enumerations;
 import com.cfloresh.mealplanner.MealPlanner;
 
 public enum States {
-    MAIN_STATE ("What would you like to do (add, show, plan, list plan, exit)?", "What would you like to do (add, show, exit)?") {
+    MAIN_STATE ("What would you like to do (add, show, plan, list plan, save, exit)?", "What would you like to do (add, show, exit)?") {
         public void performAction(MealPlanner mealPlanner) {
             mealPlanner.mainState();
         }
@@ -42,6 +42,12 @@ public enum States {
     LIST_PLAN(null, null) {
         public void performAction(MealPlanner mealPlanner) {
             mealPlanner.listPlan();
+        }
+    },
+
+    SAVE("Input a filename: ", "Invalid name for the output file.") {
+        public void performAction(MealPlanner mealPlanner) {
+            mealPlanner.save();
         }
     },
 

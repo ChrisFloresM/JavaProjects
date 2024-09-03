@@ -5,9 +5,7 @@ import com.cfloresh.mealplanner.Ingredient;
 import com.cfloresh.mealplanner.enumerations.WeekDay;
 
 import java.sql.*;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 public class DataBaseManager {
 
@@ -319,6 +317,32 @@ public class DataBaseManager {
         }
 
         return result;
+    }
+
+    public static List<String> getIngredientsFromPlan() {
+        String sqlPlan = "SELECT meal_id from plan";
+        String sqlIngredients = "SELECT ingredient FROM ingredients where meal_id = ?";
+        List<String> ingredientsList = new ArrayList<>();
+
+        try (Connection connection = startConnection()) {
+            Statement statement = connection.createStatement();
+            ResultSet resultSetPlan = statement.executeQuery(sqlPlan);
+
+            while (resultSetPlan.next()) {
+               PreparedStatement preparedStatement = connection.prepareStatement(sqlIngredients);
+               preparedStatement.setInt(1, resultSetPlan.getInt("meal_id"));
+
+               ResultSet resultSetIngredients = preparedStatement.executeQuery();
+               while (resultSetIngredients.next()) {
+                   ingredientsList.add(resultSetIngredients.getString("ingredient"));
+               }
+            }
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return ingredientsList;
     }
 
 }

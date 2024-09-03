@@ -5,8 +5,10 @@ import com.cfloresh.mealplanner.enumerations.States;
 import static com.cfloresh.mealplanner.enumerations.States.*;
 import com.cfloresh.mealplanner.database.DataBaseManager;
 import com.cfloresh.mealplanner.enumerations.WeekDay;
+import com.cfloresh.mealplanner.files.FileManager;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class MealPlanner {
@@ -35,6 +37,9 @@ public class MealPlanner {
     private WeekDay currentPlanDay;
     private MealCategory currentPlanCategory;
     private boolean planCleaned;
+
+    /* Fields used for file management */
+    private String fileName;
 
     /*************************************** Constructor / Getters / Setters ***************************************/
     /* Constructor */
@@ -73,7 +78,7 @@ public class MealPlanner {
     }
 
     public void mainState() {
-        String regex = "(add|show|plan|list plan|exit)";
+        String regex = "(add|show|plan|list plan|save|exit)";
 
         genericStateAction(state.getStateMessage(), regex, MAIN_STATE);
     }
@@ -125,6 +130,18 @@ public class MealPlanner {
         backMainMenu();
     }
 
+    public void save() {
+
+        if (DataBaseManager.planIsNotEmpty()) {
+            genericStateAction(state.getStateMessage(), ".+", MAIN_STATE);
+        } else {
+            System.out.println("Unable to save. Plan your meals first.");
+            backMainMenu();
+        }
+
+
+    }
+
     public void exitState() {
         System.out.println("Bye!");
         exit = true;
@@ -141,21 +158,22 @@ public class MealPlanner {
         readInput = false;
         if (validateInput(regex)) {
             switch (state) {
-                case MAIN_STATE -> {
-                    nextState = userInput.equals("list plan") ? LIST_PLAN : States.valueOf(userInput.toUpperCase());
-                }
+                case MAIN_STATE -> nextState = userInput.equals("list plan") ? LIST_PLAN : States.valueOf(userInput.toUpperCase());
+
                 case ADD -> currentMealCategory = userInput;
                 case GET_MEAL_NAME -> {
                     currentMealName = userInput;
                     createNewMeal();
                 }
                 case GET_MEAL_INGREDIENTS -> {
-                    currentMealIngredients = userInput.split(",\\s");
+                    currentMealIngredients = userInput.split(",");
                     addMealIngredients();
                 }
                 case SHOW -> printMeals();
-                case PLAN -> {
-                    nextState = setPlanForCurrentDay();
+                case PLAN -> nextState = setPlanForCurrentDay();
+                case SAVE -> {
+                    fileName = userInput;
+                    saveToFile(getListOfIngredients());
                 }
                 default -> System.out.println("Invalid State!!");
             }
@@ -217,7 +235,7 @@ public class MealPlanner {
     }
 
     private boolean showCategoryMeals() {
-        /* Look into the data base for all the meals for the current meal category and print it ordered alphabetically */
+        /* Look into the database for all the meals for the current meal category and print it ordered alphabetically */
         return DataBaseManager.getMealsByCategory(currentPlanCategory.getCategoryName(), currentPlanDay.getDayName());
     }
 
@@ -278,5 +296,38 @@ public class MealPlanner {
 
             exitLoop = currentDay == WeekDay.MONDAY;
         }
+    }
+
+    private Map<String, Integer> getListOfIngredients() {
+        List<String> IngredientList = DataBaseManager.getIngredientsFromPlan();
+
+        Map<String, Integer> ingredientsCount = new HashMap<>();
+
+        for (String ingredient : IngredientList) {
+            if (!ingredientsCount.containsKey(ingredient)) {
+                ingredientsCount.put(ingredient, 1);
+            } else {
+                ingredientsCount.put(ingredient, ingredientsCount.get(ingredient) + 1);
+            }
+        }
+
+        return ingredientsCount;
+    }
+
+    private void saveToFile(Map<String, Integer> ingredientList) {
+        FileManager fileManager = new FileManager(userInput);
+        String toWrite;
+
+        for (Map.Entry<String, Integer> entry : ingredientList.entrySet()) {
+            if (entry.getValue() > 1) {
+                toWrite = String.format("%s x%d", entry.getKey(), entry.getValue());
+            } else {
+                toWrite = entry.getKey();
+            }
+
+            fileManager.writeToFile(toWrite);
+        }
+
+        System.out.println("Saved!");
     }
 }

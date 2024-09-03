@@ -5,14 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6330c95f-9874-4373-8c33-e2944982c386" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/com/cfloresh/mealplanner/enumerations/MealCategory.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/com/cfloresh/mealplanner/enumerations/WeekDay.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/com/cfloresh/mealplanner/files/FileManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../BudgetManager/BudgetManager/src/com/cfloresh/budgetmanager/FileManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../BudgetManager/BudgetManager/src/com/cfloresh/budgetmanager/FileManager.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/dataSources/a8296051-e3dd-4b27-99d8-174e19377340.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/a8296051-e3dd-4b27-99d8-174e19377340.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/dataSources/a8296051-e3dd-4b27-99d8-174e19377340/storage_v2/_src_/database/meals_db.DTJjxQ/schema/public.abK9xQ.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/a8296051-e3dd-4b27-99d8-174e19377340/storage_v2/_src_/database/meals_db.DTJjxQ/schema/public.abK9xQ.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/app/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/cfloresh/mealplanner/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/cfloresh/mealplanner/Main.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/cfloresh/mealplanner/MealPlanner.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/cfloresh/mealplanner/MealPlanner.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/cfloresh/mealplanner/database/DataBaseManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/cfloresh/mealplanner/database/DataBaseManager.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/cfloresh/mealplanner/enumerations/States.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/cfloresh/mealplanner/enumerations/States.java" afterDir="false" />
@@ -48,8 +45,8 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Interface" />
-        <option value="Class" />
         <option value="Enum" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -73,7 +70,7 @@
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "git-widget-placeholder": "master",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/terry/Desktop/Code/JavaProjects/MealPlanner/MealPlanner",
+    "last_opened_file_path": "C:/Users/terry/Desktop/Code/JavaProjects/BudgetManager/BudgetManager",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -149,7 +146,7 @@
       <workItem from="1724717128447" duration="11043000" />
       <workItem from="1725121654525" duration="4449000" />
       <workItem from="1725255091523" duration="2155000" />
-      <workItem from="1725301037493" duration="8220000" />
+      <workItem from="1725301037493" duration="14341000" />
     </task>
     <servers />
   </component>

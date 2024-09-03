@@ -1,4 +1,4 @@
-package com.cfloresh.budgetmanager;
+package com.cfloresh.mealplanner.files;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -6,24 +6,16 @@ import java.util.List;
 import java.util.Scanner;
 
 public class FileManager {
-
     private final File file;
     File parentFile;
 
-    public FileManager() {
-        String outputFile = ".\\src\\com\\cfloresh\\budgetmanager\\output\\purchases.txt";
+    public FileManager(String fileName) {
+        String outputFile = String.format(".\\src\\com\\cfloresh\\mealplanner\\files\\%s", fileName);
         file = new File(outputFile);
-
-        String outputFolder = ".\\src\\com\\cfloresh\\budgetmanager\\output";
-        parentFile = new File(outputFolder);
     }
 
     public void createFileRoute() {
-        if(!parentFile.exists()) {
-            parentFile.mkdirs();
-        }
-
-        if(file.exists()) {
+        if (file.exists()) {
             file.delete();
         }
 
@@ -60,5 +52,4 @@ public class FileManager {
 
         return output;
     }
-
 }

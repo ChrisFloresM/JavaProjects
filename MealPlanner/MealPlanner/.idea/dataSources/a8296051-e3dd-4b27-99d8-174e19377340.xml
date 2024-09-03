@@ -3,7 +3,7 @@
   <database-model serializer="dbm" dbms="POSTGRES" family-id="POSTGRES" format-version="4.53">
     <root id="1">
       <DateStyle>dmy</DateStyle>
-      <IntrospectionStateNumber>1046</IntrospectionStateNumber>
+      <IntrospectionStateNumber>1325</IntrospectionStateNumber>
       <ServerVersion>16.4</ServerVersion>
       <StartupTime>1723906744</StartupTime>
       <TimeZones>true ACDT
@@ -801,7 +801,7 @@ false Zulu
 14697||10|C|G
 14697||-9223372036854775808|U|G
 14697||10|U|G</Grants>
-      <IntrospectionStateNumber>1046</IntrospectionStateNumber>
+      <IntrospectionStateNumber>1325</IntrospectionStateNumber>
       <ObjectId>16577</ObjectId>
       <OwnerName>postgres</OwnerName>
     </database>
@@ -4234,15 +4234,15 @@ false Zulu
     <schema id="266" parent="2" name="public">
       <Comment>standard public schema</Comment>
       <Current>1</Current>
-      <IntrospectionStateNumber>1046</IntrospectionStateNumber>
-      <LastIntrospectionLocalTimestamp>2024-09-02.19:38:43</LastIntrospectionLocalTimestamp>
+      <IntrospectionStateNumber>1325</IntrospectionStateNumber>
+      <LastIntrospectionLocalTimestamp>2024-09-02.21:20:34</LastIntrospectionLocalTimestamp>
       <ObjectId>2200</ObjectId>
       <StateNumber>524</StateNumber>
       <OwnerName>pg_database_owner</OwnerName>
     </schema>
     <table id="267" parent="266" name="ingredients">
-      <ObjectId>16742</ObjectId>
-      <StateNumber>945</StateNumber>
+      <ObjectId>16994</ObjectId>
+      <StateNumber>1273</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>postgres</OwnerName>
     </table>
@@ -4253,124 +4253,135 @@ false Zulu
       <OwnerName>postgres</OwnerName>
     </table>
     <table id="269" parent="266" name="meals">
-      <ObjectId>16737</ObjectId>
-      <StateNumber>979</StateNumber>
+      <ObjectId>16989</ObjectId>
+      <StateNumber>1273</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>postgres</OwnerName>
     </table>
     <table id="270" parent="266" name="plan">
-      <ObjectId>16750</ObjectId>
-      <StateNumber>979</StateNumber>
+      <ObjectId>17004</ObjectId>
+      <StateNumber>1274</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>postgres</OwnerName>
     </table>
     <column id="271" parent="267" name="ingredient">
       <Position>1</Position>
-      <StateNumber>945</StateNumber>
+      <StateNumber>1273</StateNumber>
       <StoredType>varchar(100)|0s</StoredType>
       <TypeId>1043</TypeId>
     </column>
     <column id="272" parent="267" name="ingredient_id">
       <Position>2</Position>
-      <StateNumber>945</StateNumber>
+      <StateNumber>1273</StateNumber>
       <StoredType>integer|0s</StoredType>
       <TypeId>23</TypeId>
     </column>
     <column id="273" parent="267" name="meal_id">
       <Position>3</Position>
-      <StateNumber>945</StateNumber>
+      <StateNumber>1273</StateNumber>
       <StoredType>integer|0s</StoredType>
       <TypeId>23</TypeId>
     </column>
-    <index id="274" parent="267" name="ingredients_ingredient_id_key">
+    <foreign-key id="274" parent="267" name="ingredients_meal_id_fkey">
+      <ColNames>meal_id</ColNames>
+      <NameSurrogate>1</NameSurrogate>
+      <ObjectId>16999</ObjectId>
+      <StateNumber>1273</StateNumber>
+      <RefKeyColPositions>3</RefKeyColPositions>
+      <RefTableId>16989</RefTableId>
+    </foreign-key>
+    <index id="275" parent="267" name="ingredients_ingredient_id_key">
       <ColNames>ingredient_id</ColNames>
       <NameSurrogate>1</NameSurrogate>
-      <ObjectId>16745</ObjectId>
-      <StateNumber>945</StateNumber>
+      <ObjectId>16997</ObjectId>
+      <StateNumber>1273</StateNumber>
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>
-    <key id="275" parent="267" name="ingredients_ingredient_id_key">
+    <key id="276" parent="267" name="ingredients_ingredient_id_key">
       <NameSurrogate>1</NameSurrogate>
-      <ObjectId>16746</ObjectId>
-      <StateNumber>945</StateNumber>
-      <UnderlyingIndexId>16745</UnderlyingIndexId>
+      <ObjectId>16998</ObjectId>
+      <StateNumber>1273</StateNumber>
+      <UnderlyingIndexId>16997</UnderlyingIndexId>
     </key>
-    <column id="276" parent="268" name="last_id_meals">
+    <column id="277" parent="268" name="last_id_meals">
       <Position>1</Position>
       <StateNumber>968</StateNumber>
       <StoredType>integer|0s</StoredType>
       <TypeId>23</TypeId>
     </column>
-    <column id="277" parent="268" name="last_id_ingredients">
+    <column id="278" parent="268" name="last_id_ingredients">
       <Position>2</Position>
       <StateNumber>968</StateNumber>
       <StoredType>integer|0s</StoredType>
       <TypeId>23</TypeId>
     </column>
-    <column id="278" parent="269" name="category">
+    <column id="279" parent="269" name="category">
       <Position>1</Position>
-      <StateNumber>944</StateNumber>
+      <StateNumber>1272</StateNumber>
       <StoredType>varchar(100)|0s</StoredType>
       <TypeId>1043</TypeId>
     </column>
-    <column id="279" parent="269" name="meal">
+    <column id="280" parent="269" name="meal">
       <Position>2</Position>
-      <StateNumber>944</StateNumber>
+      <StateNumber>1272</StateNumber>
       <StoredType>varchar(100)|0s</StoredType>
       <TypeId>1043</TypeId>
     </column>
-    <column id="280" parent="269" name="meal_id">
+    <column id="281" parent="269" name="meal_id">
+      <NotNull>1</NotNull>
       <Position>3</Position>
-      <StateNumber>944</StateNumber>
+      <StateNumber>1272</StateNumber>
       <StoredType>integer|0s</StoredType>
       <TypeId>23</TypeId>
     </column>
-    <index id="281" parent="269" name="meals_meal_id_key">
+    <index id="282" parent="269" name="meals_pkey">
       <ColNames>meal_id</ColNames>
       <NameSurrogate>1</NameSurrogate>
-      <ObjectId>16740</ObjectId>
-      <StateNumber>944</StateNumber>
+      <ObjectId>16992</ObjectId>
+      <Primary>1</Primary>
+      <StateNumber>1272</StateNumber>
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>
-    <key id="282" parent="269" name="meals_meal_id_key">
+    <key id="283" parent="269" name="meals_pkey">
       <NameSurrogate>1</NameSurrogate>
-      <ObjectId>16741</ObjectId>
-      <StateNumber>944</StateNumber>
-      <UnderlyingIndexId>16740</UnderlyingIndexId>
+      <ObjectId>16993</ObjectId>
+      <Primary>1</Primary>
+      <StateNumber>1272</StateNumber>
+      <UnderlyingIndexId>16992</UnderlyingIndexId>
     </key>
-    <column id="283" parent="270" name="day_of_week">
+    <column id="284" parent="270" name="day_of_week">
       <Position>1</Position>
-      <StateNumber>979</StateNumber>
+      <StateNumber>1274</StateNumber>
       <StoredType>varchar(100)|0s</StoredType>
       <TypeId>1043</TypeId>
     </column>
-    <column id="284" parent="270" name="meal_option">
+    <column id="285" parent="270" name="meal_option">
       <Position>2</Position>
-      <StateNumber>979</StateNumber>
+      <StateNumber>1274</StateNumber>
       <StoredType>varchar(100)|0s</StoredType>
       <TypeId>1043</TypeId>
     </column>
-    <column id="285" parent="270" name="meal_category">
+    <column id="286" parent="270" name="meal_category">
       <Position>3</Position>
-      <StateNumber>979</StateNumber>
+      <StateNumber>1274</StateNumber>
       <StoredType>varchar(100)|0s</StoredType>
       <TypeId>1043</TypeId>
     </column>
-    <column id="286" parent="270" name="meal_id">
+    <column id="287" parent="270" name="meal_id">
       <Position>4</Position>
-      <StateNumber>979</StateNumber>
+      <StateNumber>1274</StateNumber>
       <StoredType>integer|0s</StoredType>
       <TypeId>23</TypeId>
     </column>
-    <foreign-key id="287" parent="270" name="plan_meal_id_fkey">
+    <foreign-key id="288" parent="270" name="plan_meal_id_fkey">
       <ColNames>meal_id</ColNames>
       <NameSurrogate>1</NameSurrogate>
-      <ObjectId>16753</ObjectId>
-      <StateNumber>979</StateNumber>
+      <ObjectId>17007</ObjectId>
+      <StateNumber>1274</StateNumber>
       <RefKeyColPositions>3</RefKeyColPositions>
-      <RefTableId>16737</RefTableId>
+      <RefTableId>16989</RefTableId>
     </foreign-key>
   </database-model>
 </dataSource>
